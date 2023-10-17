@@ -6,6 +6,6 @@
    - compare your models according to that performance metric.
 
 **Week 4**
-- [ ] Find suitable data
+- [ ] Find suitable dataset
 - [ ] 
 - [ ] 
