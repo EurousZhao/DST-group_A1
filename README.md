@@ -11,4 +11,6 @@
 - [ ] 
 
 **reference**
+
 (1) health data use [Health Insurance Price Predict ](https://www.kaggle.com/code/shubhamptrivedi/health-insurance-price-predict-linear-regression/input).
+(2) [Titanic](https://www.kaggle.com/competitions/titanic/data?select=train.csv)
