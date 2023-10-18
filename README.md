@@ -7,7 +7,8 @@
 
 **Week 4**
 - [ ] Find suitable dataset
-- [ ] 
+- [ ] select model (some [reference 1](https://www.learndatasci.com/glossary/binary-classification/)
+      [reference 2](https://www.datacamp.com/blog/classification-machine-learning))
 - [ ] 
 
 **reference**
