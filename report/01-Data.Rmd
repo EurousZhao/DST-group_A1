@@ -31,3 +31,13 @@ Download it
 ```{r}
 download.file("https://github.com/dsbristol/dst/raw/master/data/conn_sample.log",path_wd("..","data","raw","conn_sample.log"))
 ```
+
+Load the data:
+```{r}
+data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+```
+
+```{r}
+head(data)
+summary(data)
+```
