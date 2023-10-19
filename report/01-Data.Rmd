@@ -37,6 +37,7 @@ Load the data:
 data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
 ```
 
+Quick peak at the data:
 ```{r}
 head(data)
 summary(data)
