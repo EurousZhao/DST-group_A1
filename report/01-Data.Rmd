@@ -13,7 +13,14 @@ output: html_notebook
 
 ## Library requirements
 
+  ! Lib requiremnts should be provided further in individual analyses
 
+We need `fs` to be able to handle directories in a cross-platform way. This makes the whole analysis much more repeatable and is good data science practice.
+
+```{r}
+if (!require("fs")) install.packages("fs")
+library("fs")
+```
 
 ## The data
 
