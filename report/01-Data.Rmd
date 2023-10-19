@@ -1,1 +1,33 @@
+---
+title: "Assessment 1 - 01: Data and Introduction"
+output: html_notebook
+---
 
+## The brief
+
+
+
+## The team
+
+
+
+## Library requirements
+
+
+
+## The data
+
+
+
+## Get the data
+
+First create a directory for it to go in:
+```{r}
+rawdatadir=path_wd("..","data","raw")
+if(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = TRUE)
+```
+
+Download it
+```{r}
+download.file("https://github.com/dsbristol/dst/raw/master/data/conn_sample.log",path_wd("..","data","raw","conn_sample.log"))
+```
