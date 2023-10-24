@@ -7,6 +7,8 @@ In your documents you should have:
   refining the question (
   test/train data
   model selection
+  model implementation on training data
+  test model on test data and use performance metric
 
 Select model and make other group members aware of it so there's no cross over
 
