@@ -36,7 +36,7 @@ if(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = TRUE)
 
 Download it
 ```{r}
-download.file("https://github.com/dsbristol/dst/raw/master/data/conn_sample.log",path_wd("..","data","raw","conn_sample.log"))
+download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv?token=GHSAT0AAAAAACIDBPPJ6XPGFLVDPD3KQYGOZJXUXHA",path_wd("..","data","raw","smoking_driking_dataset.csv"))
 ```
 
 Load the data:
