@@ -1,5 +1,5 @@
 
-QUESTION: 
+QUESTION: Can we find the most accurate model, trained on 80% training data, to predict DRK_YN from the feature set on the 20% test data? - judged by a chosen performance metric
 
 Add current code so far for python and R docs
 
