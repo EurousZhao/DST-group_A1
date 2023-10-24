@@ -1,1 +1,15 @@
+Add current code so far for python and R docs
+
+In your documents you should have:
+  data retrieval + cleaning
+  undertanding the data
+  EDA + plots/charts
+  refining the question (
+  test/train data
+  model selection
+
+Select model and make other group members aware of it so there's no cross over
+
+Have a think about performance metrics
+
 
