@@ -1,10 +1,13 @@
+
+QUESTION: 
+
 Add current code so far for python and R docs
 
 In your documents you should have:
   data retrieval + cleaning
   undertanding the data
   EDA + plots/charts
-  refining the question (
+  refining the question ~ potentially reducing the feature set - why would we do this?
   test/train data
   model selection
   model implementation on training data
