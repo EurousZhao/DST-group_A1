@@ -18,3 +18,4 @@
 (3) [Heart disease](https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset)
 (4) [Student Performance](https://www.kaggle.com/code/rizal1015/student-performance)
 
+(5)[Smoking](https://www.kaggle.com/datasets/sooyoungher/smoking-drinking-dataset)
