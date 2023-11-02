@@ -9,71 +9,16 @@ date: "2023-10-09"
 ## Pre-requisites
 
 Required Libraries:
-```{r}
-# for *Yifan's part*
-if(!require("ggplot2"))install.packages("ggplot2")
-if(!require("ggpubr"))install.packages("ggpubr")
-if(!require("gridExtra"))install.packages("gridExtra")
 
-library(gridExtra)
-library(ggpubr)
-library(ggplot2)
-
-# For manipulating data
-library(magrittr)
-library(rprojroot)
-library(forcats)
-library(dplyr)
-library(tidyr)
-library(readr)
-library(lubridate)
-library(readr)
-
-# For descriptive statistics and graphing
-library(skimr)
-library(scales)
-library(gridExtra)
-```
 
 Load the data:
-```{r}
-selected_file <- file.choose()
-italy <- read.csv(selected_file)
-```
+
 
 ## Basic Exploratory Data Analysis
 
-For some EDA we first require the date to have a date object
 
-Create a Date object data frame:
-```{r}
-italydf <- read_csv(selected_file, 
-                    col_types = cols(Time = col_date(format = "%m/%d/%Y"))) %>% 
-  setNames(c("Time", "AT")) %>% 
-  arrange(Time)
-```
-
-```{r}
-typeof(italydf)
-```
-
-
-The 'summary()' fuction is a good place to start however, we may alternately use 'skimr::skim()'
-
-```{r}
-italydf %>% skim()
-```
-It is important however, to not only use statistical summaries but also plot the data. We'll start with a simple line chart.
-
-```{r}
-italydf %>% 
-  ggplot(aes(x = Time, y = AT)) +
-  geom_line()
-
-print(italydf)
-```
+########################################################
 
 
 
-
-
+#######################################################
