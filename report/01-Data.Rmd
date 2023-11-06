@@ -36,16 +36,5 @@ if(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = TRUE)
 
 Download it
 ```{r}
-download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv?token=GHSAT0AAAAAACIDBPPJ6XPGFLVDPD3KQYGOZJXUXHA",path_wd("..","data","raw","smoking_driking_dataset.csv"))
-```
-
-Load the data:
-```{r}
-data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
-```
-
-Quick peak at the data:
-```{r}
-head(data)
-summary(data)
+download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv?token=GHSAT0AAAAAACIDBPPJRAC65UCEAOLVVV6KZKJHYLA",path_wd("..","data","raw","smoking_driking_dataset.csv"))
 ```
