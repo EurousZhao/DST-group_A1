@@ -23,7 +23,6 @@ library(rpart.plot)
 
 ## Data
 
-Load the data:
 ```{r}
 data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
 data <- as.data.frame(data)
@@ -79,6 +78,9 @@ We first convert the drinking data into numbers to facilitate our binary classif
 # Convert DRK_YN and sex columns to numeric encoding
 df$DRK_YN <- as.numeric(factor(df$DRK_YN))
 df$sex <- as.numeric(factor(df$sex))
+
+data$DRK_YN <- as.numeric(factor(df$DRK_YN))
+data$sex <- as.numeric(factor(df$sex))
 ```
 
 
@@ -124,11 +126,6 @@ plot(sada$weight, sada$height,
 
 ```{r}
 plot(sada$waistline,sada$gamma_GTP)
-```
-
-```{r}
-max(data$waistline)
-summary(data$waistline)
 ```
 
 ```{r}
@@ -256,7 +253,7 @@ rpart.plot(tree)
 ```
 
 ```{r}
-roc_curve = roc(as.numeric(Y_test), as.numeric(test_pred))
+roc_curve = roc(Y_test, as.numeric(test_pred))
 plot(roc_curve, col = "blue", main = "ROC Curve")
 #lines(roc_curve, col = "red")  # Add a line (for comparison, if needed)
 legend("bottomright", legend = c("Model A", "Model B"), col = c("blue", "red"), lty = 1)
