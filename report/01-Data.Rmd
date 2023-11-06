@@ -5,7 +5,7 @@ output: html_notebook
 
 ## The brief
 
-
+Talk about setting up the idea of being an insurance firm and wanting to be able to predict whether 'client' are smokers or not from data we have collected to then assign a higher premium.
 
 ## The team
 
