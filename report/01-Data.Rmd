@@ -9,7 +9,7 @@ output: html_notebook
 
 ## The team
 
-
+We are a four person team consisting of, *Jiaqi*, *Revati*, *Yifan*, and *Hugh*.
 
 ## Library requirements
 
