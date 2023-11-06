@@ -1,0 +1,14 @@
+---
+title: "Wrapup"
+output: html_notebook
+---
+
+## Wrapup
+
+Through different EDA methods we have allocated a time series to the data and found a general trend that could be used to poise hypotheses towards the data.
+
+We have also been able to test the data against different accruacy measures for plotting.
+
+## Conclusion
+
+Sources such as Kaggle and GitHub are reliable for extracting and manipulating code for EDA on environmental datasets.
