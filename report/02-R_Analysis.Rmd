@@ -224,6 +224,43 @@ Y_train_pca <- target_pca[splitIndex]
 Y_test_pca <- target_pca[-splitIndex]
 ```
 
+## Decision Trees
+
+```{r}
+# Assuming X_train is the matrix/data.frame of features and Y_train is the target variable
+#my_tree <- rpart(Y_train ~ ., data = cbind(X_train, Y_train), method = "class")
+tree <- rpart(Y_train ~ ., data = X_train, method = "class")
+#tree_pca <- rpart(Y_train_pca ~ ., data = X_train_pca, method = "class")
+```
+
+```{r}
+test_pred <- predict(tree, X_test, type = "class")
+#test_pred_pca <- predict(tree_pca, X_test_pca, type = "class")
+
+test_confMat <- confusionMatrix(test_pred, as.factor(Y_test))
+print(test_confMat)
+
+#confusionMatrix(test_pred_pca, as.factor(Y_test_pca)[1:38412])
+```
+
+```{r}
+test_confMatdf <- as.data.frame(test_confMat$table)
+ggplot(data = teconfmatdf, aes(x = Reference, y = Prediction, fill = Freq)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = 1) +
+  labs(title = "Confusion Matrix", x = "Actual", y = "Predicted")
+```
+
+```{r}
+rpart.plot(tree)
+```
+
+```{r}
+roc_curve = roc(as.numeric(Y_test), as.numeric(test_pred))
+plot(roc_curve, col = "blue", main = "ROC Curve")
+#lines(roc_curve, col = "red")  # Add a line (for comparison, if needed)
+legend("bottomright", legend = c("Model A", "Model B"), col = c("blue", "red"), lty = 1)
+```
 
 ## XGBoost
 
@@ -331,23 +368,5 @@ cat("Recall (True Positive Rate): ", format(recall, nsmall = 2), "\n")
 ```
 
 xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons.
-
-## Decision Trees
-
-```{r}
-# Assuming X_train is the matrix/data.frame of features and Y_train is the target variable
-#my_tree <- rpart(Y_train ~ ., data = cbind(X_train, Y_train), method = "class")
-tree <- rpart(Y_train ~ ., data = X_train, method = "class")
-tree_pca <- rpart(Y_train_pca ~ ., data = X_train_pca, method = "class")
-```
-
-```{r}
-test_pred <- predict(tree, X_test, type = "class")
-test_pred_pca <- predict(tree_pca, X_test_pca, type = "class")
-
-confusionMatrix(test_pred, as.factor(Y_test))
-confusionMatrix(test_pred_pca, as.factor(Y_test_pca)[1:38412])
-```
-
 
 
