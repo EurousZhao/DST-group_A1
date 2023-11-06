@@ -178,7 +178,7 @@ This means that many of these variables work together.
 
 ```{r}
 # Scale the data for PCA (optional but recommended)
-scaled_data <- scale(X_train)
+scaled_data <- scale(predictors)
 
 # Apply PCA
 pca_result <- prcomp(scaled_data, scale. = TRUE)
@@ -193,15 +193,14 @@ reduced_data <- as.data.frame(predict(pca_result))
 We take the first 12 principal components which capture 80% of the variance
 
 ```{r}
-reddata <- reduced_data[,1:12]
-correlation_matrix2 <- cor(reddata)
+data_pca <- as.data.frame(pca_result$x[, 1:12])
+correlation_matrix2 <- cor(data_pca)
 corrplot(correlation_matrix2, method = "color")
 ```
 
 We'll reduce the PCA result data frame into our 12 PCs that capture our vairance tolerance
 
 ```{r}
-data_pca <- as.data.frame(pca_result$x[, 1:12])
 head(data_pca)
 ```
 
@@ -225,24 +224,30 @@ Y_test_pca <- target_pca[-splitIndex]
 
 ```{r}
 # Assuming X_train is the matrix/data.frame of features and Y_train is the target variable
-#my_tree <- rpart(Y_train ~ ., data = cbind(X_train, Y_train), method = "class")
 tree <- rpart(Y_train ~ ., data = X_train, method = "class")
-#tree_pca <- rpart(Y_train_pca ~ ., data = X_train_pca, method = "class")
+tree_pca <- rpart(Y_train_pca ~ ., data = cbind(X_train_pca, Y_train_pca), method = "class")
 ```
 
 ```{r}
 test_pred <- predict(tree, X_test, type = "class")
-#test_pred_pca <- predict(tree_pca, X_test_pca, type = "class")
+test_pred_pca <- predict(tree_pca, X_test_pca, type = "class")
 
 test_confMat <- confusionMatrix(test_pred, as.factor(Y_test))
-print(test_confMat)
+test_confMat_pca <- confusionMatrix(test_pred_pca, as.factor(Y_test_pca))
 
-#confusionMatrix(test_pred_pca, as.factor(Y_test_pca)[1:38412])
+print(test_confMat)
+print(test_confMat_pca)
 ```
 
 ```{r}
 test_confMatdf <- as.data.frame(test_confMat$table)
-ggplot(data = teconfmatdf, aes(x = Reference, y = Prediction, fill = Freq)) +
+ggplot(data = test_confMatdf, aes(x = Reference, y = Prediction, fill = Freq)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = 1) +
+  labs(title = "Confusion Matrix", x = "Actual", y = "Predicted")
+
+test_confMatdf_pca <- as.data.frame(test_confMat_pca$table)
+ggplot(data = test_confMatdf_pca, aes(x = Reference, y = Prediction, fill = Freq)) +
   geom_tile() +
   geom_text(aes(label = Freq), vjust = 1) +
   labs(title = "Confusion Matrix", x = "Actual", y = "Predicted")
@@ -250,12 +255,14 @@ ggplot(data = teconfmatdf, aes(x = Reference, y = Prediction, fill = Freq)) +
 
 ```{r}
 rpart.plot(tree)
+rpart.plot(tree_pca)
 ```
 
 ```{r}
 roc_curve = roc(Y_test, as.numeric(test_pred))
+roc_curve2 = roc(Y_test_pca, as.numeric(test_pred_pca))
 plot(roc_curve, col = "blue", main = "ROC Curve")
-#lines(roc_curve, col = "red")  # Add a line (for comparison, if needed)
+lines(roc_curve2, col = "red")
 legend("bottomright", legend = c("Model A", "Model B"), col = c("blue", "red"), lty = 1)
 ```
 
@@ -365,5 +372,7 @@ cat("Recall (True Positive Rate): ", format(recall, nsmall = 2), "\n")
 ```
 
 xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons.
+
+## Analysis
 
 
