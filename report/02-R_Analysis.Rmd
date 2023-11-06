@@ -79,6 +79,7 @@ data <- remove_outliers_all_columns(data)
 ```{r}
 summary(data)
 ```
+
 ```{r}
 summary(dataog)
 ```
@@ -472,6 +473,87 @@ cat("Recall (True Positive Rate): ", format(recall, nsmall = 2), "\n")
 
 xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons.
 
-## Analysis
+WARNING: Running time is about 1min
+```{r}
+# Data preparation
+X_train <- as.matrix(X_train)
+X_test <- as.matrix(X_test)
+
+# Treat labels as numeric if they are for binary classification
+y_train <- as.numeric(y_train)
+
+# List of different iteration rounds
+rounds <- c(10, 50, 75, 100, 125, 150, 200)  # You can add more rounds as needed
+
+# Store models and accuracies for different iteration rounds
+models <- list()
+accuracies <- numeric(length(rounds))
+
+# Loop to train models for different iteration rounds
+for (i in 1:length(rounds)) {
+  # Create an XGBoost classification model
+  model <- xgboost(data = X_train, label = y_train, objective = "binary:logistic", nrounds = rounds[i])
+  models[[i]] <- model  # Store the model
+  
+  # Make predictions using the model
+  y_pred <- predict(model, X_test)
+  
+  # Set the threshold
+  threshold <- 0.5
+  
+  # Convert probability values to binary classification labels
+  y_pred_binary <- ifelse(y_pred >= threshold, 1, 0)
+  
+  # Calculate accuracy
+  accuracy <- mean(y_pred_binary == y_test)
+  accuracies[i] <- accuracy  # Store accuracy
+}
+
+# Output accuracies for different iteration rounds
+results <- data.frame(Rounds = rounds, Accuracy = accuracies)
+print(results)
+```
+```{r}
+# Create a data frame to store the results
+results_df <- data.frame(Rounds = rounds, Accuracy = accuracies)
+
+# Fit a polynomial regression model (using a 6th-degree polynomial, you can adjust the degree as needed)
+poly_fit <- lm(Accuracy ~ poly(Rounds, 4), data = results_df)
+
+# Create a new data frame for plotting the fitted curve
+plot_data <- data.frame(Rounds = seq(min(rounds), max(rounds), length.out = 100))
+
+# Predict the values of the fitted curve
+plot_data$Accuracy <- predict(poly_fit, newdata = data.frame(Rounds = plot_data$Rounds))
+
+# Find the maximum accuracy point on the fitted curve
+max_accuracy <- max(plot_data$Accuracy)
+max_round <- plot_data$Rounds[which.max(plot_data$Accuracy)]
+
+# Create the plot object, set the axis limits
+p <- ggplot(results_df, aes(x = Rounds, y = Accuracy)) +
+  geom_point() +  # Plot the original data points
+  geom_line(data = plot_data, aes(x = Rounds, y = Accuracy), color = "blue") +  # Plot the fitted curve
+  labs(x = "Rounds", y = "Accuracy") +  # Set axis labels
+  theme_minimal() +  # Set the plot theme
+  ylim(0.725, 0.745)  # Set the y-axis limits
+
+# Add a label for the maximum value
+p <- p + annotate("text", x = max_round, y = max_accuracy, label = paste("Max Accuracy =", round(max_accuracy, 4)), vjust = -1, hjust = 0.5, color = "red")
+
+# Add a label for the maximum value's corresponding round
+p <- p + annotate("text", x = max_round, y = max_accuracy, label = paste("at Rounds =", round(max_round, 0)), vjust = 1, hjust = 0.5, color = "red")
+
+# Display the plot
+print(p)
+```
+The interesting phenomenon is that as the number of boost rounds increases, the accuracy will first increase, and then slowly decrease to a stable value.
+
+## XGBoost Analysis
+
+
+
+
+## Joint Analyses
 
 
