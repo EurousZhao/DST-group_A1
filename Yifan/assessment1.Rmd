@@ -1,0 +1,452 @@
+---
+title: "Assessment 1 - 01: Data and Introduction"
+output: html_notebook
+---
+
+## The brief of Yifan's work:
+Overall, I used two methods to predict alcohol consumption using body data, one was linear regression, adapted from the code for another parameter. The other is to use the xgboost method to predict. This method is used quite a lot and generally provides higher accuracy.
+
+## Library requirements
+
+  ! Lib requiremnts should be provided further in individual analyses
+
+We need `fs` to be able to handle directories in a cross-platform way. This makes the whole analysis much more repeatable and is good data science practice.
+
+```{r}
+if (!require("fs")) install.packages("fs")
+library("fs")
+```
+
+## Get the data
+
+First create a directory for it to go in:
+```{r}
+rawdatadir=path_wd("..","data","raw")
+if(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = TRUE)
+```
+
+Download it 
+```{r}
+download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv?token=GHSAT0AAAAAACIGOW4DKCCQADVOTCVVS4UOZKDXRXA",path_wd("..","data","raw","smoking_driking_dataset.csv"))
+```
+Referring to kaggle's python code, rewritten it into R and made modified.
+('https://www.kaggle.com/code/rakibhasan3948/hemoglobin-label-predictin-with-100-accuracy')
+
+Load the data:
+```{r}
+data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+```
+
+Quick peak at the data:
+```{r}
+head(data)
+summary(data)
+library(data.table)
+df <- data
+head(df)
+```
+Quickly check the data type.
+```{r}
+str(df)
+```
+Below is an explanation of these variables, which represent body data:
+
+Sex	male, female	
+age	round up to 5 years	
+height	round up to 5 cm[cm]	
+weight	[kg]	
+sight_left	eyesight(left)	
+sight_right	eyesight(right)	
+hear_left	hearing left, 1(normal), 2(abnormal)	
+hear_right	hearing right, 1(normal), 2(abnormal)	
+SBP	Systolic blood pressure[mmHg]	 
+DBP	Diastolic blood pressure[mmHg]	 
+BLDS	BLDS or FSG(fasting blood glucose)[mg/dL]	
+tot_chole	total cholesterol[mg/dL]	 
+HDL_chole	HDL cholesterol[mg/dL]	HDL 
+LDL_chole	LDL cholesterol[mg/dL]	LDL 
+triglyceride	triglyceride[mg/dL]	
+hemoglobin	hemoglobin[g/dL]	
+urine_protein	protein in urine, 1(-), 2(+/-), 3(+1), 4(+2), 5(+3), 6(+4)	 
+serum_creatinine	serum(blood) creatinine[mg/dL] 
+SGOT_AST	SGOT(Glutamate-oxaloacetate transaminase) AST(Aspartate transaminase)[IU/L]	 AST
+SGOT_ALT	ALT(Alanine transaminase)[IU/L]	 ALT
+gamma_GTP	y-glutamyl transpeptidase[IU/L]	
+SMK_stat_type_cd	Smoking state, 1(never), 2(used to smoke but quit), 3(still smoke)	
+DRK_YN	Drinker or Not
+```{r}
+summary(df)
+```
+We first convert the drinking data into numbers to facilitate our binary classification
+```{r}
+# Convert DRK_YN and sex columns to numeric encoding
+df$DRK_YN <- as.numeric(factor(df$DRK_YN))
+df$sex <- as.numeric(factor(df$sex))
+
+# Replace 1 with 0 and 2 with 1 in the DRK_YN column
+df$DRK_YN[df$DRK_YN == 1] <- 0
+df$DRK_YN[df$DRK_YN == 2] <- 1
+```
+
+##Use visual methods to represent relationships between variables
+
+```{r}
+if (!require("corrplot")) install.packages("corrplot")
+# Load the corrplot package
+library(corrplot)
+```
+
+```{r}
+# Calculate the correlation matrix
+correlation_matrix <- cor(df)
+
+# Create a correlation matrix heatmap
+corrplot(correlation_matrix, method = "color")
+correlation_matrix
+```
+If we count the variables that have the highest impact on drinking, we find that whether drinking has a large positive correlation with the four variables of sex, height, smoking, and hemoglobin concentration, and a large negative correlation with age. 
+Among them, height has the greatest impact, which may be unexpected.
+
+One possible explanation is that there is a large positive correlation between body size and gender, which is caused by the fact that men are generally taller than women. All we have to do is look at the relationship between gender and height, hemoglobin and smoking
+
+Visualizing the correlation matrix plot allows us to see this very quickly.No doubt, height, weight, hemoglobin and smoking have a very large positive correlation with gender!
+This means that many of these variables work together.
+
+```{r}
+colSums(is.na(df))
+```
+There are no gaps in the data set
+
+##linear regression model
+
+First, use the linear regression model, which is ONLY USED as an expected control group to evaluate whether the method used later performs well.
+
+Let’s first split the data
+```{r}
+# Selecting predictor variables x and target variable y
+x <- df[, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22)]
+y <- df$DRK_YN
+
+# Install and load the caTools package for sample.split function
+if (!require("caTools")) install.packages("caTools")
+library(caTools)
+
+# Set a random seed for reproducibility
+set.seed(0)
+
+# Splitting the dataset using sample.split function
+split <- sample.split(y, SplitRatio = 0.8)
+
+# Creating training and testing sets
+x_train <- x[split, ]
+x_test <- x[!split, ]
+y_train <- y[split]
+y_test <- y[!split]
+```
+
+
+This part performs linear fitting of the model
+
+
+```{r}
+# Combine x_train and y_train into a single data frame
+train_data <- data.frame(y = y_train, x_train)
+
+# Create a linear regression model
+model <- lm(y ~ ., data = train_data)
+
+# Output model summary
+summary(model)
+```
+
+We fit all the parameters and we at least now know that drinking alcohol does not affect vision and hearing
+
+```{r}
+# Predict y values on the test data
+y_pred <- predict(model, newdata = data.frame(x_test))
+
+# Calculate R-squared
+r_squared <- 1 - (sum((y_test - y_pred)^2) / sum((y_test - mean(y_test))^2))
+
+# Display the R-squared value
+print(r_squared)
+```
+The R^2 of the model is quite low and does not seem to be a good result, When the R² value is low, it indicates that the model cannot explain the changes in the dependent variable well, and there may be a problem of insufficient model fitting.
+
+```{r}
+# Predict the target variable values for the test data
+y_pred <- predict(model, newdata = data.frame(x_test))
+
+# Calculate the Mean Squared Error (MSE)
+mse <- mean((y_test - y_pred)^2)
+
+# Output the MSE
+print(paste("Mean Squared Error (MSE):", mse))
+```
+
+However, when we calculated mse, we found that it was also very low. This suggests that the model has limited interpretation of the data but is still relatively accurate in its predictions.
+
+```{r}
+# Create an example of actual categories and predicted categories
+actual <- y_test  # Actual categories (using the real target variable values from the test data)
+predicted <- predict(model, newdata = data.frame(x_test))  # Predicted categories by the model
+
+# Convert continuous prediction values to binary categories
+predicted_binary <- ifelse(predicted > 0.5, 1, 0)
+
+# Create a confusion matrix
+confusion_matrix <- table(Actual = actual, Predicted = predicted_binary)
+
+# Output the confusion matrix
+print(confusion_matrix)
+
+accuracy <- sum(diag(confusion_matrix)) / sum(confusion_matrix)
+cat("Accuracy:", accuracy, "\n")
+```
+When using all data for prediction, the accuracy is 0.7164792. Some data may affect the prediction accuracy, but this is also the result that linear fitting can give
+
+What’s interesting is that if we use this model to predict the variable hemoglobin, we will get a very small mse value.
+```{r}
+# Select predictor variables x and target variable y
+x <- df[, c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 15, 16, 17, 18, 19, 20, 21, 22, 23)]
+y <- df$hemoglobin
+
+# Set a random seed for reproducibility
+set.seed(0)
+
+# Split the dataset using the sample.split function
+split <- sample.split(y, SplitRatio = 0.8)
+
+# Create training and testing sets
+x_train <- x[split, ]
+x_test <- x[!split, ]
+y_train <- y[split]
+y_test <- y[!split]
+
+# Combine x_train and y_train into a single data frame
+train_data <- data.frame(y = y_train, x_train)
+
+# Create a linear regression model
+modelh <- lm(y ~ ., data = train_data)
+
+# Output model summary
+summary(modelh)
+
+# Predict the target variable values for the test data
+y_pred <- predict(modelh, newdata = data.frame(x_test))
+
+# Calculate the Mean Squared Error (MSE)
+mse <- mean((y_test - y_pred)^2)
+
+# Output MSE
+print(paste("Mean Squared Error (MSE):", mse))
+
+```
+
+Then we can see the miracle appeared, a model with (nearly )100% prediction accuracy. Demonstrated that body data can predict hemoglobin concentration very well.
+
+```{r}
+# Predict y values on the test data
+y_pred <- predict(modelh, newdata = data.frame(x_test))
+
+# Calculate R-squared
+r_squared <- 1 - (sum((y_test - y_pred)^2) / sum((y_test - mean(y_test))^2))
+
+# Display the R-squared value
+print(r_squared)
+```
+
+##xgboost
+XGBoost, short for eXtreme Gradient Boosting, It falls under the category of ensemble learning methods and is based on decision tree models. XGBoost trains models in a gradient-boosting manner.
+ It falls under the category of ensemble learning methods and is based on decision tree models. XGBoost trains models in a gradient-boosting manner. 
+code based on (https://www.kaggle.com/code/raman209/prediction-of-drinkers-using-body-signals)
+
+```{r}
+if (!require("ggplot2")) install.packages("ggplot2")
+if (!require("reshape2")) install.packages("reshape2")
+if (!require("dplyr")) install.packages("dplyr")
+if (!require("caret")) install.packages("caret")
+
+# Import necessary packages
+library(ggplot2)   # The ggplot2 package provides functionality for creating plots.
+library(reshape2)  # The reshape2 package is used for data reshaping.
+library(dplyr) 
+library(caret)# The dplyr package is used for data manipulation.
+```
+
+```{r}
+# Select the feature columns
+X <- df[, !names(df) %in% c("DRK_YN")]
+# Select the target variable column
+y <- df$DRK_YN
+```
+
+Since we mentioned before that drinking is related to age, let’s try to visualize the age distribution
+
+```{r}
+# Create a ggplot chart
+p <- ggplot(data = df, aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "lightblue", color = "black") +
+  geom_density(color = "red") +
+  labs(x = "Age", y = "Frequency", title = "Distribution of Age")
+
+# Display the chart
+print(p)
+```
+The age data are mainly concentrated in the 35-65 age group, which shows that the subjects who provided the data are generally middle-aged and elderly people.
+
+We still split the data into training data and test data according to the ratio of 80%
+```{r}
+# Set a random seed to ensure reproducible results
+set.seed(123)
+
+test_size <- 0.2  # 20% of the data is used for testing
+
+# Split the data using the sample.split function
+split <- sample.split(y, SplitRatio = 1 - test_size)
+
+# Create the training set
+X_train <- X[split, ]
+y_train <- y[split]
+
+# Create the test set
+X_test <- X[!split, ]
+y_test <- y[!split]
+```
+
+Now we use xgboost for data fitting, and the number of boost rounds is set to 100.This number was obtained later through subsequent attempts.
+
+```{r}
+# Install the xgboost package if not already installed
+if (!require("xgboost")) install.packages("xgboost")
+library(xgboost)
+
+# Create an XGBoost classifier model round = 100
+model <- xgboost(data = as.matrix(X_train), label = y_train, objective = "binary:logistic", nrounds = 100)
+
+# Use the model for predictions
+y_pred <- predict(model, as.matrix(X_test))
+# Print the prediction results
+print(y_pred)
+```
+
+Next we test the accuracy of the model using a confusion matrix.
+
+```{r}
+# Custom rounding function
+custom_round <- function(x) {
+  ifelse(x < 0.5, 0, 1)
+}
+
+# Convert y_pred to binary classification labels
+y_pred_binary <- ifelse(y_pred >= 0.5, 1, 0)
+
+# Convert y_test to a factor
+y_test <- factor(y_test, levels = c(0, 1))
+
+# Convert y_pred_binary to a factor
+y_pred_binary <- factor(y_pred_binary, levels = c(0, 1))
+
+# Ensure they have the correct levels
+levels_y_test <- levels(factor(y_test))
+y_pred_binary <- factor(y_pred_binary, levels = levels_y_test)
+
+# Now you can calculate accuracy and generate a classification report
+accuracy <- confusionMatrix(data = y_pred_binary, reference = y_test)$overall["Accuracy"]
+cat("Accuracy: ", format(accuracy, nsmall = 2), "\n")
+
+# Generate a classification report
+confusion_matrix <- confusionMatrix(data = y_pred_binary, reference = y_test)
+print(confusion_matrix)
+```
+
+And the recall rate is:
+```{r}
+# Calculate True Positives (TP) and False Negatives (FN)
+TP <- sum(y_test == 1 & y_pred_binary == 1)
+FN <- sum(y_test == 1 & y_pred_binary == 0)
+
+# Calculate Recall
+recall <- TP / (TP + FN)
+
+cat("Recall (True Positive Rate): ", format(recall, nsmall = 2), "\n")
+
+```
+
+xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons.
+
+WARNING: Running time is about 1min
+```{r}
+# Data preparation
+X_train <- as.matrix(X_train)
+X_test <- as.matrix(X_test)
+
+# Treat labels as numeric if they are for binary classification
+y_train <- as.numeric(y_train)
+
+# List of different iteration rounds
+rounds <- c(10, 50, 75, 100, 125, 150, 200)  # You can add more rounds as needed
+
+# Store models and accuracies for different iteration rounds
+models <- list()
+accuracies <- numeric(length(rounds))
+
+# Loop to train models for different iteration rounds
+for (i in 1:length(rounds)) {
+  # Create an XGBoost classification model
+  model <- xgboost(data = X_train, label = y_train, objective = "binary:logistic", nrounds = rounds[i])
+  models[[i]] <- model  # Store the model
+  
+  # Make predictions using the model
+  y_pred <- predict(model, X_test)
+  
+  # Set the threshold
+  threshold <- 0.5
+  
+  # Convert probability values to binary classification labels
+  y_pred_binary <- ifelse(y_pred >= threshold, 1, 0)
+  
+  # Calculate accuracy
+  accuracy <- mean(y_pred_binary == y_test)
+  accuracies[i] <- accuracy  # Store accuracy
+}
+
+# Output accuracies for different iteration rounds
+results <- data.frame(Rounds = rounds, Accuracy = accuracies)
+print(results)
+```
+```{r}
+# Create a data frame to store the results
+results_df <- data.frame(Rounds = rounds, Accuracy = accuracies)
+
+# Fit a polynomial regression model (using a 6th-degree polynomial, you can adjust the degree as needed)
+poly_fit <- lm(Accuracy ~ poly(Rounds, 4), data = results_df)
+
+# Create a new data frame for plotting the fitted curve
+plot_data <- data.frame(Rounds = seq(min(rounds), max(rounds), length.out = 100))
+
+# Predict the values of the fitted curve
+plot_data$Accuracy <- predict(poly_fit, newdata = data.frame(Rounds = plot_data$Rounds))
+
+# Find the maximum accuracy point on the fitted curve
+max_accuracy <- max(plot_data$Accuracy)
+max_round <- plot_data$Rounds[which.max(plot_data$Accuracy)]
+
+# Create the plot object, set the axis limits
+p <- ggplot(results_df, aes(x = Rounds, y = Accuracy)) +
+  geom_point() +  # Plot the original data points
+  geom_line(data = plot_data, aes(x = Rounds, y = Accuracy), color = "blue") +  # Plot the fitted curve
+  labs(x = "Rounds", y = "Accuracy") +  # Set axis labels
+  theme_minimal() +  # Set the plot theme
+  ylim(0.725, 0.745)  # Set the y-axis limits
+
+# Add a label for the maximum value
+p <- p + annotate("text", x = max_round, y = max_accuracy, label = paste("Max Accuracy =", round(max_accuracy, 4)), vjust = -1, hjust = 0.5, color = "red")
+
+# Add a label for the maximum value's corresponding round
+p <- p + annotate("text", x = max_round, y = max_accuracy, label = paste("at Rounds =", round(max_round, 0)), vjust = 1, hjust = 0.5, color = "red")
+
+# Display the plot
+print(p)
+```
+The interesting phenomenon is that as the number of boost rounds increases, the accuracy will first increase, and then slowly decrease to a stable value.
