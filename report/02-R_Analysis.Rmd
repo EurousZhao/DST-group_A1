@@ -18,6 +18,7 @@ library(caret)
 library(rpart)
 library(reshape2)  # The reshape2 package is used for data reshaping.
 library(dplyr) # The dplyr package is used for data manipulation.
+library(rpart.plot)
 ```
 
 ## Data
