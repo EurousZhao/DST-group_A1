@@ -9,16 +9,344 @@ date: "2023-10-09"
 ## Pre-requisites
 
 Required Libraries:
+```{r}
+if(!require("ggplot2"))install.packages("ggplot2")
 
+library(ggplot2)
+library(corrplot)
+library(caret)
+library(rpart)
+library(reshape2)  # The reshape2 package is used for data reshaping.
+library(dplyr) # The dplyr package is used for data manipulation.
+```
+
+## Data
 
 Load the data:
+```{r}
+data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+data <- as.data.frame(data)
+df <- as.data.frame(data)
+data$DRK_YN <- ifelse(data$DRK_YN == "Y", 1, 0)       # MUST ONLY BE RUN ONCE !
+data$sex <- ifelse(data$sex == "Male", 1, 0)
+```
 
 
-## Basic Exploratory Data Analysis
+```{r}
+typeof(data)
+class(data)
+dim(data)
+head(data)
+summary(data)
+str(data)
+```
+Remove outliers e.g. waistline 999
+```{r}
+
+```
 
 
-########################################################
+Below is an explanation of these variables, which represent body data:
+
+Sex	male, female	
+age	round up to 5 years	
+height	round up to 5 cm[cm]	
+weight	[kg]	
+sight_left	eyesight(left)	
+sight_right	eyesight(right)	
+hear_left	hearing left, 1(normal), 2(abnormal)	
+hear_right	hearing right, 1(normal), 2(abnormal)	
+SBP	Systolic blood pressure[mmHg]	 
+DBP	Diastolic blood pressure[mmHg]	 
+BLDS	BLDS or FSG(fasting blood glucose)[mg/dL]	
+tot_chole	total cholesterol[mg/dL]	 
+HDL_chole	HDL cholesterol[mg/dL]	HDL 
+LDL_chole	LDL cholesterol[mg/dL]	LDL 
+triglyceride	triglyceride[mg/dL]	
+hemoglobin	hemoglobin[g/dL]	
+urine_protein	protein in urine, 1(-), 2(+/-), 3(+1), 4(+2), 5(+3), 6(+4)	 
+serum_creatinine	serum(blood) creatinine[mg/dL] 
+SGOT_AST	SGOT(Glutamate-oxaloacetate transaminase) AST(Aspartate transaminase)[IU/L]	 AST
+SGOT_ALT	ALT(Alanine transaminase)[IU/L]	 ALT
+gamma_GTP	y-glutamyl transpeptidase[IU/L]	
+SMK_stat_type_cd	Smoking state, 1(never), 2(used to smoke but quit), 3(still smoke)	
+DRK_YN	Drinker or Not
+
+
+We first convert the drinking data into numbers to facilitate our binary classification
+```{r}
+# Convert DRK_YN and sex columns to numeric encoding
+df$DRK_YN <- as.numeric(factor(df$DRK_YN))
+df$sex <- as.numeric(factor(df$sex))
+```
+
+
+```{r}
+colSums(is.na(data))
+```
+
+### Test/Train split
+
+```{r}
+# Assuming 'dataset' is your data frame
+predictors <- data[, -which(names(data) == "DRK_YN")]
+target <- data$DRK_YN
+
+# Split the data into training and testing sets
+set.seed(0)  # Set a random seed for reproducibility
+splitIndex <- createDataPartition(target, p = 0.8, list = FALSE)
+X_train <- predictors[splitIndex, ]
+X_test <- predictors[-splitIndex, ]
+Y_train <- target[splitIndex]
+Y_test <- target[-splitIndex]
+```
+
+
+## EDA and plots
+
+```{r}
+# Sample 10,000 rows from your_data
+sada <- data[sample(nrow(data), 10000), ]
+targetsada <- sada$DRK_YN
+
+# 'sada' now contains 10,000 randomly selected rows from 'data'
+head(sada)
+```
+
+
+```{r}
+# Create a scatter plot
+plot(sada$weight, sada$height, 
+     xlab = "weight", ylab = "height", 
+     main = "Scatter Plot of x vs. y")
+```
+
+```{r}
+plot(sada$waistline,sada$gamma_GTP)
+```
+
+```{r}
+max(data$waistline)
+summary(data$waistline)
+```
+
+```{r}
+ggplot(sada, aes(x = `hemoglobin`, group = targetsada, fill = targetsada)) +
+  geom_density(alpha = 0.5)
+```
+
+##  Feature Selection and Correlation - Test/train split + Feature selection + correlation/PCA
+
+```{r}
+correlation_matrix <- cor(data)
+
+# Get the absolute correlation values of "target" with other variables
+target_correlations <- abs(correlation_matrix[,"DRK_YN"])
+
+# Sort the correlations in descending order
+sorted_correlations <- sort(target_correlations, decreasing = TRUE)
+
+# Print the sorted correlations
+print(sorted_correlations)
+```
+
+```{r}
+corrplot(correlation_matrix, method = "color")
+```
+
+If we count the variables that have the highest impact on drinking, we find that whether drinking has a large positive correlation with the four variables of sex, height, smoking, and hemoglobin concentration, and a large negative correlation with age. 
+Among them, height has the greatest impact, which may be unexpected.
+
+One possible explanation is that there is a large positive correlation between body size and gender, which is caused by the fact that men are generally taller than women. All we have to do is look at the relationship between gender and height, hemoglobin and smoking
+
+Visualizing the correlation matrix plot allows us to see this very quickly.No doubt, height, weight, hemoglobin and smoking have a very large positive correlation with gender!
+This means that many of these variables work together.
+
+### picking only uncorrelated features
+
+```{r}
+# Assuming 'correlation_matrix' is your correlation matrix
+#high_correlation_threshold <- 0.85  # Define a correlation threshold
+
+# Find highly correlated features
+#highly_correlated <- findCorrelation(correlation_matrix, cutoff = high_correlation_threshold)
+
+# Remove highly correlated features
+#reduced_features <- X_train[, -highly_correlated]
+#print(reduced_features)
+```
+
+### PCA
+
+```{r}
+# Scale the data for PCA (optional but recommended)
+scaled_data <- scale(X_train)
+
+# Apply PCA
+pca_result <- prcomp(scaled_data, scale. = TRUE)
+
+# Explained variance by each principal component
+summary(pca_result)
+
+# Retrieve transformed data with reduced dimensions
+reduced_data <- as.data.frame(predict(pca_result))
+```
+
+We take the first 12 principal components which capture 80% of the variance
+
+```{r}
+reddata <- reduced_data[,1:12]
+correlation_matrix2 <- cor(reddata)
+corrplot(correlation_matrix2, method = "color")
+```
+
+We'll reduce the PCA result data frame into our 12 PCs that capture our vairance tolerance
+
+```{r}
+data_pca <- as.data.frame(pca_result$x[, 1:12])
+head(data_pca)
+```
+
+We now create training and test data based on PC1-PC12 to see how it compares ahead with model accuracy
+
+```{r}
+# Assuming 'dataset' is your data frame
+predictors_pca <- data_pca[, -which(names(data) == "DRK_YN")]
+target_pca <- data$DRK_YN
+
+# Split the data into training and testing sets
+set.seed(0)  # Set a random seed for reproducibility
+splitIndex <- createDataPartition(target, p = 0.8, list = FALSE)
+X_train_pca <- predictors_pca[splitIndex, ]
+X_test_pca <- predictors_pca[-splitIndex, ]
+Y_train_pca <- target_pca[splitIndex]
+Y_test_pca <- target_pca[-splitIndex]
+```
+
+
+## XGBoost
+
+XGBoost, short for eXtreme Gradient Boosting, It falls under the category of ensemble learning methods and is based on decision tree models. XGBoost trains models in a gradient-boosting manner.
+ It falls under the category of ensemble learning methods and is based on decision tree models. XGBoost trains models in a gradient-boosting manner. 
+code based on (https://www.kaggle.com/code/raman209/prediction-of-drinkers-using-body-signals)
+
+```{r}
+# Select the feature columns
+X <- df[, !names(df) %in% c("DRK_YN")]
+# Select the target variable column
+y <- df$DRK_YN
+```
+
+Since we mentioned before that drinking is related to age, let’s try to visualize the age distribution
+
+```{r}
+# Create a ggplot chart
+p <- ggplot(data = df, aes(x = age)) +
+  geom_histogram(binwidth = 5, fill = "lightblue", color = "black") +
+  geom_density(color = "red") +
+  labs(x = "Age", y = "Frequency", title = "Distribution of Age")
+
+# Display the chart
+print(p)
+```
+The age data are mainly concentrated in the 35-65 age group, which shows that the subjects who provided the data are generally middle-aged and elderly people.
+
+We still split the data into training data and test data according to the ratio of 80%
+```{r}
+# Set a random seed to ensure reproducible results
+set.seed(123)
+
+test_size <- 0.2  # 20% of the data is used for testing
+
+# Split the data using the sample.split function
+split <- sample.split(y, SplitRatio = 1 - test_size)
+
+# Create the training set
+X_train <- X[split, ]
+y_train <- y[split]
+
+# Create the test set
+X_test <- X[!split, ]
+y_test <- y[!split]
+```
+
+Now we use xgboost for data fitting, and the number of boost rounds is set to 100.This number was obtained later through subsequent attempts.
+
+```{r}
+# Install the xgboost package if not already installed
+if (!require("xgboost")) install.packages("xgboost")
+library(xgboost)
+
+# Create an XGBoost classifier model round = 100
+model <- xgboost(data = as.matrix(X_train), label = y_train, objective = "binary:logistic", nrounds = 100)
+
+# Use the model for predictions
+y_pred <- predict(model, as.matrix(X_test))
+# Print the prediction results
+print(y_pred)
+```
+
+Next we test the accuracy of the model using a confusion matrix.
+
+```{r}
+# Custom rounding function
+custom_round <- function(x) {
+  ifelse(x < 0.5, 0, 1)
+}
+
+# Convert y_pred to binary classification labels
+y_pred_binary <- ifelse(y_pred >= 0.5, 1, 0)
+
+# Convert y_test to a factor
+y_test <- factor(y_test, levels = c(0, 1))
+
+# Convert y_pred_binary to a factor
+y_pred_binary <- factor(y_pred_binary, levels = c(0, 1))
+
+# Ensure they have the correct levels
+levels_y_test <- levels(factor(y_test))
+y_pred_binary <- factor(y_pred_binary, levels = levels_y_test)
+
+# Now you can calculate accuracy and generate a classification report
+accuracy <- confusionMatrix(data = y_pred_binary, reference = y_test)$overall["Accuracy"]
+cat("Accuracy: ", format(accuracy, nsmall = 2), "\n")
+
+# Generate a classification report
+confusion_matrix <- confusionMatrix(data = y_pred_binary, reference = y_test)
+print(confusion_matrix)
+```
+
+And the recall rate is:
+```{r}
+# Calculate True Positives (TP) and False Negatives (FN)
+TP <- sum(y_test == 1 & y_pred_binary == 1)
+FN <- sum(y_test == 1 & y_pred_binary == 0)
+
+# Calculate Recall
+recall <- TP / (TP + FN)
+
+cat("Recall (True Positive Rate): ", format(recall, nsmall = 2), "\n")
+
+```
+
+xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons.
+
+## Decision Trees
+
+```{r}
+# Assuming X_train is the matrix/data.frame of features and Y_train is the target variable
+#my_tree <- rpart(Y_train ~ ., data = cbind(X_train, Y_train), method = "class")
+tree <- rpart(Y_train ~ ., data = X_train, method = "class")
+tree_pca <- rpart(Y_train_pca ~ ., data = X_train_pca, method = "class")
+```
+
+```{r}
+test_pred <- predict(tree, X_test, type = "class")
+test_pred_pca <- predict(tree_pca, X_test_pca, type = "class")
+
+confusionMatrix(test_pred, as.factor(Y_test))
+confusionMatrix(test_pred_pca, as.factor(Y_test_pca)[1:38412])
+```
 
 
 
-#######################################################
