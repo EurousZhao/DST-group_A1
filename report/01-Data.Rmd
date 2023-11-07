@@ -23,7 +23,7 @@ Whilst the overall binary classification problem on the drinking target is clear
 
 We pose as analysts at a health insurance broker. The data has been collected from our policy holders and we need to determine from this data whether they drink or not as to assign a higher premium if they do, given the far greater health risks associated with drinking.
 
-* We acknlowedge the incredibly unlikely situaton where an insurance broker would have an insured person's urine protein level but not be able to ask whether they drink or not. However, we postulate our policy holders would be untruthful in answering this question so we must predict the asnwer ourselves.
+* We acknlowedge the incredibly unlikely situaton where an insurance broker would have an insured person's gamma GTP level (one of the features) but not be able to ask whether they drink or not. However, we postulate our policy holders would be untruthful in answering this question so we must predict the asnwer ourselves.
 
 ## Library requirements
 
