@@ -36,5 +36,5 @@ if(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = TRUE)
 
 Download it
 ```{r}
-download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv?token=GHSAT0AAAAAACIDBPPIU5U5UP3N3TNM3G4QZKKES2Q",path_wd("..","data","raw","smoking_driking_dataset.csv"))
+download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv",path_wd("..","data","raw","smoking_driking_dataset.csv"))
 ```
