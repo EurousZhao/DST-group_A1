@@ -27,7 +27,9 @@ We pose as analysts at a health insurance broker. The data has been collected fr
 
 ## Library requirements
 
-  ! Lib requiremnts should be provided further in individual analyses
+Each script handles it's own requirments, using a simple check-and-install system.
+
+Separate requirements files are given for ease of use.
 
 We need `fs` to be able to handle directories in a cross-platform way. This makes the whole analysis much more repeatable and is good data science practice.
 
@@ -38,9 +40,17 @@ library("fs")
 
 ## The data
 
+We found a good dataset for binary classificatoin on Kaggle.
 
+To obtain this dataset in a convenient format for both analyses, we will download it and process it into a standard form.
 
-## Get the data
+We place raw data in the `data` folder in the main branch.
+
+* /data
+  * /data/raw
+    * /data/raw/smoking_driking_dataset.csv
+
+### Get the data
 
 First create a directory for it to go in:
 ```{r}
@@ -53,8 +63,16 @@ Download it
 download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv",path_wd("..","data","raw","smoking_driking_dataset.csv"))
 ```
 
+The data is already headed.
+
+### Create the data output
+
 ```{r}
 data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
 ```
 
-whilst we could've processed the data a little here, we decided to allow that to happen in the analyses to greater contribution to the analysis narrative of understanding the data
+whilst we could've processed the data a little here, we decided to do that in the analyses to greater contribution to the narrative of understanding and processing the data.
+
+### Summary
+
+We have now created our data for further processing, in a simple headed tabular format.
