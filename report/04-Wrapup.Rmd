@@ -6,6 +6,7 @@ output: html_notebook
 ## Wrapup
 
 We used four different models to perform binary classification on whether to drink alcohol. We used python to implement knn and linear regression, and used r to implement decision trees and xgboost.
+We then used a confusion matrix to evaluate their recall rate.
 
 ## Conclusion
 
