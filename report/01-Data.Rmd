@@ -5,11 +5,19 @@ output: html_notebook
 
 ## The brief
 
-Talk about setting up the idea of being an insurance firm and wanting to be able to predict whether 'client' are smokers or not from data we have collected to then assign a higher premium.
+The brief was to:
+
+* Consider a binary classification problem in which each group member will create a model submission that can be evaluated on lefft-out test data
+* Together agree and test a performance metric
+* Compare our models according to that performance metric
 
 ## The team
 
-We are a four person team consisting of, *Jiaqi*, *Revati*, *Yifan*, and *Hugh*.
+We are a four person team consisting of, *Jiaqi*, *Revati*, *Yifan*, and *Hugh*. We decided to split into pairs, Hugh and Yifan, Jiaqi and Revati, to contribute into R and Python analyses respectively. We all intend on contributing equally to this project.
+
+## Problem Context and Introduction
+
+Talk about setting up the idea of being an insurance firm and wanting to be able to predict whether 'client' are smokers or not from data we have collected to then assign a higher premium.
 
 ## Library requirements
 
