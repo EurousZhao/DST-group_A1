@@ -1,21 +1,54 @@
-# DST-group_A1
-**Your task for this project is to:**
-   - Consider a binary classification or simple regression problem,
-   - In which each group member will create a model submission that can be evaluated on left-out test data;
-   - together agree and test a performance metric;
-   - compare your models according to that performance metric.
+## Project Group
 
-**Week 4**
-- [ ] Find suitable dataset
-- [ ] select model (some [reference 1](https://www.learndatasci.com/glossary/binary-classification/)
-      [reference 2](https://www.datacamp.com/blog/classification-machine-learning))
-- [ ] 
+* Yifan
+* Hugh
+* Jiaqi
+* Revati
 
-**reference**
+This project has a 25/25/25/25 equity split betwen the four project partners.
 
-(1) health data use [Health Insurance Price Predict ](https://www.kaggle.com/code/shubhamptrivedi/health-insurance-price-predict-linear-regression/input).
-(2) [Titanic](https://www.kaggle.com/competitions/titanic/data?select=train.csv)
-(3) [Heart disease](https://www.kaggle.com/datasets/johnsmith88/heart-disease-dataset)
-(4) [Student Performance](https://www.kaggle.com/code/rizal1015/student-performance)
+## Reading order and requirements
 
-(5)[Smoking](https://www.kaggle.com/datasets/sooyoungher/smoking-drinking-dataset)
+All report content is in the directory:
+
+* report/
+
+The report takes the following structure:
+
+* 01-Data.Rmd
+* 02-R_analysis.Rmd
+* 03-Python_Analysis.ipynb
+* 04-Wrapup.Rmd
+
+With html output of the Rmd content included for convenience.
+
+### Requirements:
+
+Requirements for the Rmd files are given within each script, or can be installed in advance using:
+```{sh}
+Rscript requirementsR.R
+```
+in which the list of packages used is given.
+
+Requirements for the Python code is given in `requirements.txt`; to install, in a virtual environment run:
+
+```{sh}
+pip3 install -r requirements.txt
+```
+
+## Evidence
+
+Our working is shown in our own directories,
+
+* assessment1.Rmd
+* Logistic Regression Model.ipynb
+* 
+
+Yifan and Hugh R wrote the R analysis, Jiaqi and Revati wrote the Python analysis, and we wrote the Data processing and wrapup together after examination of the whole analysis.
+
+## Reflections
+
+We have placed our reflections in the folder:
+
+* reflection/
+
