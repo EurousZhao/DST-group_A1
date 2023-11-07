@@ -15,7 +15,9 @@ The brief was to:
 
 We are a four person team consisting of, *Jiaqi*, *Revati*, *Yifan*, and *Hugh*. We decided to split into pairs, Hugh and Yifan, Jiaqi and Revati, to contribute into R and Python analyses respectively. We all intend on contributing equally to this project.
 
-## Problem Context and Introduction
+## Introduction and Problem Context
+
+
 
 Talk about setting up the idea of being an insurance firm and wanting to be able to predict whether 'client' are smokers or not from data we have collected to then assign a higher premium.
 
@@ -50,3 +52,5 @@ download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Da
 ```{r}
 data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
 ```
+
+whilst we could've processed the data a little here, we decided to allow that to happen in the analyses to greater contribution to the analysis narrative of understanding the data
