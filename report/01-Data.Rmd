@@ -38,3 +38,7 @@ Download it
 ```{r}
 download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv",path_wd("..","data","raw","smoking_driking_dataset.csv"))
 ```
+
+```{r}
+data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+```
