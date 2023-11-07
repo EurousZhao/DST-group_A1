@@ -35,7 +35,8 @@ library(caTools)
 ## Data
 
 ```{r}
-data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+data <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
+dataog <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
 data <- as.data.frame(data)
 df <- as.data.frame(data)
 data$DRK_YN <- ifelse(data$DRK_YN == "Y", 1, 0)       # MUST ONLY BE RUN ONCE !
@@ -356,13 +357,6 @@ rpart.plot(tree)
 rpart.plot(tree_pca)
 ```
 
-```{r}
-roc_curve = roc(Y_test, as.numeric(test_pred))
-roc_curve2 = roc(Y_test_pca, as.numeric(test_pred_pca))
-plot(roc_curve, col = "blue", main = "ROC Curve")
-lines(roc_curve2, col = "red")
-legend("bottomright", legend = c("Decision Tree", "PCA-transfromed Decision Tree"), col = c("blue", "red"), lty = 1)
-```
 
 ### Decision Tree Analysis
 
@@ -575,6 +569,15 @@ The rounds parameter in XGBoost determines the complexity of the model. A lower 
 
 In this model, the rounds value is set to 100 to ensure that the model is accurate enough.
 
+```{r}
+roc_curve = roc(Y_test, as.numeric(test_pred))
+roc_curve2 = roc(Y_test_pca, as.numeric(test_pred_pca))
+roc_curve3 = roc(y_pred_binary, as.numeric(y_test))
+plot(roc_curve, col = "blue", main = "ROC Curve")
+lines(roc_curve2, col = "red")
+lines(roc_curve3, col = "black")
+legend("bottomright", legend = c("Decision Tree", "PCA-transfromed Decision Tree", "Xgboost"), col = c("blue", "red","black"), lty = 1)
+```
 ## Analysis of xgboost
 
 The True Positive Rate provided by xgboost is about 0.738, which is almost equal to the max accuracy it provides.
