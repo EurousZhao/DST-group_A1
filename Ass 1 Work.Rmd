@@ -1,0 +1,328 @@
+---
+title: "Ass 1 Work"
+output: html_document
+date: "2023-10-19"
+---
+
+traditional mathematical models
+to learn about the appropriateness of the model + consider the appropriateness of the performance metric
+80% training data, 20% test data - how to do this? bagging?
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+################################
+
+## The data
+
+First create a directory for it to go in:
+
+```{r}
+if (!require("fs")) install.packages("fs")
+library("fs")
+```
+
+
+
+```{r}
+rawdatadir = path_wd("..","data","raw")
+if(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = TRUE)
+```
+
+Download it
+```{r}
+download.file("https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv",path_wd("..","data","raw","smoking_driking_dataset.csv"))
+```
+
+Load the data:
+```{r}
+data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+data$DRK_YN <- ifelse(data$DRK_YN == "Y", 1, 0)       # MUST ONLY BE RUN ONCE !
+data$sex <- ifelse(data$sex == "Male", 1, 0)
+```
+
+```{r}
+typeof(data)
+class(data)
+dim(data)
+```
+
+```{r}
+head(data)
+summary(data)
+```
+
+```{r}
+str(data)
+```
+
+```{r}
+# Find missing values
+missing_values <- is.na(data$Value)
+
+# Print the rows with missing values
+print(data[missing_values, ])
+table(missing_values)
+print(missing_values)
+```
+
+```{r}
+info <- c("age", "1: male, 0: female", "chest pain type, 1: typical angina, 2: atypical angina, 3: non-anginal pain, 4: asymptomatic", "resting blood pressure", "serum cholestoral in mg/dl", "fasting blood sugar > 120 mg/dl", "resting electrocardiographic results (values 0,1,2)", "maximum heart rate achieved", "exercise induced angina", "oldpeak = ST depression induced by exercise relative to rest", "the slope of the peak exercise ST segment", "number of major vessels (0-3) colored by flourosopy", "thal: 3 = normal; 6 = fixed defect; 7 = reversible defect")
+
+# Assuming you have a dataset with column names in a data frame
+# For demonstration, we'll create a simple data frame with column names
+dataset <- data.frame("age" = NA, "gender" = NA, "chest_pain" = NA, "resting_bp" = NA, "cholesterol" = NA, "fasting_sugar" = NA, "ecg_result" = NA, "max_heart_rate" = NA, "exercise_angina" = NA, "oldpeak" = NA, "slope" = NA, "vessels" = NA, "thal" = NA)
+
+# Print column names and descriptions
+for (i in 1:length(info)) {
+  cat(names(dataset)[i], ":\t\t\t", info[i], "\n")
+}
+```
+
+```{r}
+# Assuming you have a data frame named 'data'
+
+# Select only numeric columns from the data frame
+numeric_data <- data[sapply(data, is.numeric)]
+
+# Calculate the correlation matrix
+correlation_matrix <- cor(numeric_data)
+#correlation_matrix <- cor(data)
+
+# Get the absolute correlation values of "target" with other variables
+target_correlations <- abs(correlation_matrix[,"DRK_YN"])
+
+# Sort the correlations in descending order
+sorted_correlations <- sort(target_correlations, decreasing = TRUE)
+
+# Print the sorted correlations
+print(sorted_correlations)
+
+```
+
+```{r}
+# Sample 10,000 rows from your_data
+sada <- data[sample(nrow(data), 10000), ]
+targetsada <- sada$DRK_YN
+# 'sampled_data' now contains 10,000 randomly selected rows from 'your_data'
+head(sada)
+```
+
+
+
+```{r}
+# Assuming you have a data frame named 'dataset' and you want to create a scatter plot of two columns, e.g., 'column1' and 'column2'
+# Replace 'column1' and 'column2' with the actual column names from your dataset.
+
+# Create a scatter plot
+plot(sada$weight, sada$height, 
+     xlab = "weight", ylab = "height", 
+     main = "Scatter Plot of x vs. y")
+
+```
+
+```{r}
+plot(sada$waistline,sada$gamma_GTP)
+```
+
+```{r}
+length(sada$gamma_GTP)
+length(targetsada)
+
+# Subset where binary_feature is TRUE
+sub1 <- sada[sada$DRK_YN == 1, ]
+target1 <- sub1$DRK_YN
+
+# Subset where binary_feature is FALSE
+sub0 <- sada[sada$DRK_YN == 0, ]
+target0 <- sub0$DRK_YN
+
+head(sub1)
+head(sub0)
+```
+
+```{r}
+ggplot(sada, aes(x = `height`, group = targetsada, fill = targetsada)) +
+  geom_density(alpha = 0.5)
+```
+
+```{r}
+missing_vals <- is.na(data)
+#nfv <- !is.finite(data$age)
+summary(missing_vals)
+```
+
+```{r}
+# Load the caret package (if not already installed)
+# install.packages("caret")
+library(caret)
+
+# Assuming 'dataset' is your data frame
+predictors <- data[, -which(names(data) == "DRK_YN")]
+target <- data$DRK_YN
+
+# Split the data into training and testing sets
+set.seed(0)  # Set a random seed for reproducibility
+splitIndex <- createDataPartition(target, p = 0.8, list = FALSE)
+X_train <- predictors[splitIndex, ]
+X_test <- predictors[-splitIndex, ]
+Y_train <- target[splitIndex]
+Y_test <- target[-splitIndex]
+```
+
+```{r}
+class(Y_test) # for confusion matrix as Y_test was a numeric variable and need it to be a factor
+str(Y_test)
+Y_test <- factor(Y_test)
+levels(Y_test)
+Y_train <- factor(Y_train)
+```
+
+```{r}
+library(pROC)
+
+# Fit a logistic regression model
+lr <- glm(Y_train ~ ., data = cbind(Y_train, X_train), family = "binomial")
+
+# Make predictions on the test data
+Y_pred_lr <- predict(lr, newdata = X_test, type = "response")
+
+# Calculate ROC and AUC
+roc_obj <- roc(Y_test, Y_pred_lr)
+auc_value <- auc(roc_obj)
+
+# Print the AUC
+print(paste("AUC:", auc_value))
+```
+
+#######
+
+Feature Selection
+
+```{r}
+# Assuming X_train is your dataset
+library(corrplot)
+
+# Compute the correlation matrix
+correlation_matrix <- cor(X_train)
+
+# Create a heatmap of the correlation matrix
+corrplot(correlation_matrix, method = "color", col = colorRampPalette(c("brown", "white", "blue"))(200))
+
+```
+
+```{r}
+# Assuming 'correlation_matrix' is your correlation matrix
+high_correlation_threshold <- 0.85  # Define a correlation threshold
+
+# Find highly correlated features
+highly_correlated <- findCorrelation(correlation_matrix, cutoff = high_correlation_threshold)
+
+# Remove highly correlated features
+reduced_features <- X_train[, -highly_correlated]
+print(reduced_features)
+```
+
+PCA to select features and reduce feature correlation
+
+```{r}
+# Assuming 'X' is your data matrix
+#pca_result <- prcomp(X_train, scale. = TRUE)
+
+# Scale the data for PCA (optional but recommended)
+scaled_data <- scale(X_train)
+
+# Apply PCA
+pca_result <- prcomp(scaled_data, scale. = TRUE)
+
+# Explained variance by each principal component
+summary(pca_result)
+
+# Retrieve transformed data with reduced dimensions
+reduced_data <- as.data.frame(predict(pca_result))
+
+
+```
+```{r}
+reddata <- reduced_data[,1:12]
+correlation_matrix2 <- cor(reddata)
+corrplot(correlation_matrix2, method = "color", col = colorRampPalette(c("brown", "white", "blue"))(200))
+```
+
+
+########
+
+Decision trees
+
+```{r}
+library(rpart)
+
+# Assuming X_train is the matrix/data.frame of features and Y_train is the target variable
+my_tree <- rpart(Y_train ~ ., data = cbind(X_train, Y_train), method = "class")
+tree<- rpart(Y_train ~ ., data = X_train, method = "class")
+```
+
+```{r}
+  #predictions <- predict(my_tree, cbind(X_test, Y_test), type = "class")
+trpred <- predict(tree, X_train, type = "class")
+tepred <- predict(tree, X_test, type = "class")
+```
+
+```{r}
+  #confusionMatrix(predictions, Y_test)
+trconfmat <- confusionMatrix(trpred, Y_train)
+teconfmat <- confusionMatrix(tepred, Y_test)
+tracc <- mean(trpred == Y_train) * 100
+teacc <- mean(tepred == Y_test) * 100
+print(trconfmat)
+print(teconfmat)
+print(tracc)
+print(teacc)
+```
+
+```{r}
+#library(caret)
+#plot(trconfmat$table)
+#plot(teconfmat$table)
+library(ggplot2)
+trconfmatdf <- as.data.frame(trconfmat$table)
+teconfmatdf <- as.data.frame(teconfmat$table)
+ggplot(data = trconfmatdf, aes(x = Reference, y = Prediction, fill = Freq)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = 1) +
+  labs(title = "Confusion Matrix", x = "Actual", y = "Predicted")
+ggplot(data = teconfmatdf, aes(x = Reference, y = Prediction, fill = Freq)) +
+  geom_tile() +
+  geom_text(aes(label = Freq), vjust = 1) +
+  labs(title = "Confusion Matrix", x = "Actual", y = "Predicted")
+```
+
+
+```{r}
+install.packages("rpart.plot")
+library("rpart.plot")
+```
+
+```{r}
+rpart.plot(tree)
+```
+
+This could mean some highly correlated features
+
+```{r}
+# true_labels = Y_test, predicted_values = tepred
+Y_test_num = as.numeric(Y_test)
+teprednum = as.numeric(tepred)
+roc_curve = roc(Y_test_num, teprednum)
+```
+
+```{r}
+plot(roc_curve, col = "blue", main = "ROC Curve")
+#lines(roc_curve, col = "red")  # Add a line (for comparison, if needed)
+legend("bottomright", legend = c("Model A", "Model B"), col = c("blue", "red"), lty = 1)
+```
+
+
+
+
