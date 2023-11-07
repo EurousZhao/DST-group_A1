@@ -35,8 +35,8 @@ library(caTools)
 ## Data
 
 ```{r}
-data <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
-dataog <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
+data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+dataog <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
 data <- as.data.frame(data)
 df <- as.data.frame(data)
 data$DRK_YN <- ifelse(data$DRK_YN == "Y", 1, 0)       # MUST ONLY BE RUN ONCE !
@@ -428,15 +428,16 @@ X_test <- X[!split, ]
 y_test <- y[!split]
 ```
 
-Now we use xgboost for data fitting, and the number of boost rounds is set to 100.This number was obtained later through subsequent attempts.
+Now we use xgboost for data fitting, and the number of boost rounds is set to 25.This number was obtained later through subsequent attempts. Learning rate set to 0.3
 
 ```{r}
 # Install the xgboost package if not already installed
 if (!require("xgboost")) install.packages("xgboost")
 library(xgboost)
 
+
 # Create an XGBoost classifier model round = 100
-model <- xgboost(data = as.matrix(X_train), label = y_train, objective = "binary:logistic", nrounds = 100)
+model <- xgboost(data = as.matrix(X_train), label = y_train,eta <- 0.3, objective = "binary:logistic", nrounds = 25)
 
 # Use the model for predictions
 y_pred <- predict(model, as.matrix(X_test))
@@ -474,7 +475,7 @@ confusion_matrix <- confusionMatrix(data = y_pred_binary, reference = y_test)
 print(confusion_matrix)
 ```
 
-And the recall rate is:
+The True Positive Rate is very important for model compare, And the recall rate of xgboost is:
 ```{r}
 # Calculate True Positives (TP) and False Negatives (FN)
 TP <- sum(y_test == 1 & y_pred_binary == 1)
@@ -487,10 +488,9 @@ cat("Recall (True Positive Rate): ", format(recall, nsmall = 2), "\n")
 
 ```
 
-xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons.
-One of the possible reasons is the data itself. It is very difficult to improve the accuracy of prediction when using all features. Our python code shows the accuracy of some model regressions, which almost all stop at around 75%. , making it almost impossible to obtain higher accuracy without more processing of the data.
+## The relationship between accuracy and number of iterations
 
-In the normal settings of xgboost, the accuracy will change slightly with the different number of rounds, and its value is not monotonically increasing.
+In the normal settings of xgboost, the accuracy will change slightly with the different number of rounds, and its value is not monotonically increasing. It will reach the maximum value in a certain interval.
 ```{r}
 # Data preparation
 X_train <- as.matrix(X_train)
@@ -500,7 +500,7 @@ X_test <- as.matrix(X_test)
 y_train <- as.numeric(y_train)
 
 # List of different iteration rounds
-rounds <- c(1,5,10, 50, 75, 100, 125, 150, 200)  # You can add more rounds as needed
+rounds <- c(1,5,10,25, 50, 75, 100, 125, 150, 200)  # You can add more rounds as needed
 
 # Store models and accuracies for different iteration rounds
 models <- list()
@@ -530,12 +530,15 @@ for (i in 1:length(rounds)) {
 results <- data.frame(Rounds = rounds, Accuracy = accuracies)
 print(results)
 ```
+
+We want to explore the relationship between accuracy and number of iterations
+
 ```{r}
 # Create a data frame to store the results
 results_df <- data.frame(Rounds = rounds, Accuracy = accuracies)
 
 # Fit a polynomial regression model (using a 6th-degree polynomial, you can adjust the degree as needed)
-poly_fit <- lm(Accuracy ~ poly(Rounds, 7), data = results_df)
+poly_fit <- lm(Accuracy ~ poly(Rounds, 4), data = results_df)
 
 # Create a new data frame for plotting the fitted curve
 plot_data <- data.frame(Rounds = seq(min(rounds), max(rounds), length.out = 100))
@@ -546,11 +549,34 @@ plot_data$Accuracy <- predict(poly_fit, newdata = data.frame(Rounds = plot_data$
 # Find the maximum accuracy point on the fitted curve
 max_accuracy <- max(plot_data$Accuracy)
 max_round <- plot_data$Rounds[which.max(plot_data$Accuracy)]
+```
 
+
+```{r}
+# Create the plot object, set the axis limits
+#p <- ggplot(results_df, aes(x = Rounds, y = Accuracy)) +
+#  geom_point() +  # Plot the original data points
+  #geom_line(data = plot_data, aes(x = Rounds, y = Accuracy), color = "blue") +  # Plot the fitted curve
+#  labs(x = "Rounds", y = "Accuracy") +  # Set axis labels
+#  theme_minimal() +  # Set the plot theme
+#  ylim(0.72, 0.745)  # Set the y-axis limits
+
+# Add a label for the maximum value
+#p <- p + annotate("text", x = max_round, y = max_accuracy, label = paste("Max Accuracy =", round(max_accuracy, 4)), vjust = -1, hjust = 0.5, color = "red")
+
+# Add a label for the maximum value's corresponding round
+#p <- p + annotate("text", x = max_round, y = max_accuracy, label = paste("at Rounds =", round(max_round, 0)), vjust = 1, hjust = 0.5, color = "red")
+
+# Display the plot
+#print(p)
+```
+
+Draw the curve of Rounds and Accuracy
+```{r}
 # Create the plot object, set the axis limits
 p <- ggplot(results_df, aes(x = Rounds, y = Accuracy)) +
   geom_point() +  # Plot the original data points
-  #geom_line(data = plot_data, aes(x = Rounds, y = Accuracy), color = "blue") +  # Plot the fitted curve
+  geom_smooth(method = "loess", color = "blue") +  # Add a smoothed curve
   labs(x = "Rounds", y = "Accuracy") +  # Set axis labels
   theme_minimal() +  # Set the plot theme
   ylim(0.72, 0.745)  # Set the y-axis limits
@@ -563,11 +589,16 @@ p <- p + annotate("text", x = max_round, y = max_accuracy, label = paste("at Rou
 
 # Display the plot
 print(p)
-```
-The maximum accuracy is in the rounds interval 80-100, which is approximately 0.7371.
-The rounds parameter in XGBoost determines the complexity of the model. A lower value of rounds can lead to underfitting, where the model is too simple to capture the underlying patterns in the data. Conversely, a higher value of rounds can result in overfitting, where the model becomes excessively complex and starts fitting the noise in the training data.
 
-In this model, the rounds value is set to 100 to ensure that the model is accurate enough.
+```
+
+The maximum accuracy is in the rounds interval 25-100, which is approximately 0.738.
+
+A lot of information can be obtained from this curve. First, The rounds parameter in XGBoost determines the complexity of the model. A lower value of rounds can lead to underfitting, where the model is too simple to capture the underlying patterns in the data. Conversely, a higher value of rounds can result in overfitting, where the model becomes excessively complex and starts fitting the noise in the training data. In this model, the rounds value is set to 25 to ensure that the max recall rate.
+
+On the other hand, the accuracy of the model has stabilized after more than 30 iterations. The xgboost model has shown high accuracy with a very small number of iterations, and it can be considered that its convergence of accuracyis very fast.
+
+##Analyze three models using ROC curves
 
 ```{r}
 roc_curve = roc(Y_test, as.numeric(test_pred))
@@ -576,16 +607,48 @@ roc_curve3 = roc(y_pred_binary, as.numeric(y_test))
 plot(roc_curve, col = "blue", main = "ROC Curve")
 lines(roc_curve2, col = "red")
 lines(roc_curve3, col = "black")
-legend("bottomright", legend = c("Decision Tree", "PCA-transfromed Decision Tree", "Xgboost"), col = c("blue", "red","black"), lty = 1)
+legend("bottomright", legend = c("Decision Tree", "PCA-transfromed Decision Tree", "XGboost"), col = c("blue", "red","black"), lty = 1)
 ```
+
+Xgboost model has a higher Area Under the Receiver Operating Characteristic Curve (AUC) compared to Decision Tree, it indicates that Xgboost has better discrimination or predictive ability in distinguishing between the drinker and non-drinker in this binary classification problem.
+
 ## Analysis of xgboost
 
 The True Positive Rate provided by xgboost is about 0.738, which is almost equal to the max accuracy it provides.
-Compared with the decision tree model, xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons. One of the possible reasons is the data itself.Due to its characteristics, model regression in most cases may not provide higher accuracy unless more detailed or targeted processing is performed.
+Compared with the decision tree model, xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons. One of the possible reasons is the data itself.Due to its characteristics, ours models in most cases may not provide higher accuracy unless more detailed or targeted processing is performed.
 
-However, compared to accuracy, the most powerful thing about the xgboost model is its saving of computing time! After the number of rounds reaches more than 10 times, the change in accuracy has been less than 1%. In actual use, 10-20 boost rounds can meet the demand. Even when processing larger data, the xgboost algorithm will greatly reduce the calculation time. In other words, the xgboost algorithm is excellent in both efficiency and accuracy.
+In terms of boosting, xgboost algorithm combines multiple weak learners (such as decision trees) to create a strong learner. So called 'Gradient Boosting'.It is an important part of the xgboost algorithm.The Gradient Boosting process works as follows:
 
-## Conclusion
+A base model (usually a simple decision tree) is trained on the dataset.
+
+The base model's predictions are used to compute the residuals, which are the differences between the true target values and the model's predictions.
+
+A new base model is then trained to predict these residuals. This new model focuses on the errors made by the previous model.
+
+The predictions of the new model are combined with the predictions of the previous models, and the residuals are updated.
+
+This process is repeated iteratively, with each new model learning to correct the errors made by the existing ensemble. Controlled according to the number of iteration rounds, reaching the maximum value within a certain range.
+
+Another powerful thing about the xgboost model is its saving of computing time! After the number of rounds reaches more than 10 times, the change in accuracy has been less than 1%.
+In actual use, 15-25 boost rounds can meet the demand. Even when processing larger data, the xgboost algorithm will greatly reduce the calculation time. In other words, the xgboost algorithm is excellent in both efficiency and accuracy.
+
+One of the way xgboost can be accomplished the requirement with a smaller number of iterations rounds is it limits the size of the trees. XgBoost incorporates L1 (Lasso) and L2 (Ridge) regularization terms into its objective function.For example,
+adds a penalty term to the objective function that encourages the model to have sparse feature importance. It does this by adding the absolute values of the weights of the features to the objective function. As a result, it can drive some feature weights to exactly zero, 
+effectively selecting a subset of the most important features. These regularization terms help control the complexity of individual trees and the ensemble.
+By constraining the weights of the trees, xgBoost prevents them from becoming too deep or overfitting the training data. Regularization can lead to faster convergence by reducing the tendency of the model to overfit.
+
+Setting the learning rate can also improve efficiency. The learning rate determines how far the model parameters will advance in the direction of the negative gradient with each parameter update. 
+A smaller learning rate results in a small step size, making parameter updates more cautious and contributing to more stable convergence, but may require more iterations to reach the optimal solution.A smaller learning rate can make the optimization process more stable but slower,
+while a larger learning rate can speed up convergence but may result in overshooting the minimum. Here we use the default learning rate of 0.3.
+If we reduce it to 0.1, the accuracy will be slightly improved, but the calculation speed also be slower.
+
+Overall, XGBoost excels in efficiency and accuracy but demands expertise in configuration and understanding of data to fully leverage its capabilities.
+It can effectively analyze complex data accurately and quickly, and the effect is usually stronger than most models.
+If want to obtain a model that better meets your needs, you must manually try many parameters (such as the number of iterations, learning rate) many times to obtain it. 
+
+In terms of results, this model performs well in solving our problem and meets our needs.
+
+## Analysis of two classification methods
 
 For this particular dataset, both Decision Trees and XGBoost achieved similar accuracy levels, but XGBoost demonstrated superior speed. Additionally, the decrease in accuracy for Decision Trees after using PCA suggests that feature engineering and preprocessing are critical considerations when working with Decision Trees. However, XGBoost seems more resilient to dimensionality reduction, which is an advantage in scenarios where feature engineering is required.
 
