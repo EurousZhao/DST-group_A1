@@ -17,7 +17,13 @@ We are a four person team consisting of, *Jiaqi*, *Revati*, *Yifan*, and *Hugh*.
 
 ## Introduction and Problem Context
 
+The data we selceted is a large dataset with 22 body/health related features, a ternary classification for smoking, and a binary classification for whether someone drinks or not.
 
+Whilst the overall binary classification problem on the drinking target is clear, we find it improtant to provide a real-world scenario in which we will be working our analyses towards. 
+
+We pose as analysts at a health insurance broker. The data has been collected from our policy holders (unrealistic 
+
+* We acknlowedge the incredibly unlikely situaton where an insurance broker would have an insured person's urine protein level but not be able to ask whether they smoke or not. However, we postulate our policy holders would be untruthful in answering this question so we shall predict the asnwer ourselves.
 
 Talk about setting up the idea of being an insurance firm and wanting to be able to predict whether 'client' are smokers or not from data we have collected to then assign a higher premium.
 
