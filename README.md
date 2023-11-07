@@ -42,7 +42,7 @@ Our working is shown in our own directories,
 
 * assessment1.Rmd
 * Logistic Regression Model.ipynb
-* 
+* Ass 1 Work.Rmd
 
 Yifan and Hugh R wrote the R analysis, Jiaqi and Revati wrote the Python analysis, and we wrote the Data processing and wrapup together after examination of the whole analysis.
 
