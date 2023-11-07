@@ -35,7 +35,8 @@ library(caTools)
 ## Data
 
 ```{r}
-data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+data <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
+dataog <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
 data <- as.data.frame(data)
 df <- as.data.frame(data)
 data$DRK_YN <- ifelse(data$DRK_YN == "Y", 1, 0)       # MUST ONLY BE RUN ONCE !
