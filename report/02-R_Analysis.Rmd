@@ -35,7 +35,8 @@ library(caTools)
 ## Data
 
 ```{r}
-data <- data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
+data <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
+dataog <- read.table("C:/Users/User/Desktop/smoking_driking_dataset.csv",header=TRUE, sep = ",")
 data <- as.data.frame(data)
 df <- as.data.frame(data)
 data$DRK_YN <- ifelse(data$DRK_YN == "Y", 1, 0)       # MUST ONLY BE RUN ONCE !
@@ -54,36 +55,36 @@ head(data)
 summary(data)
 str(data)
 ```
-##!!!Remove this part!
-Remove outliers e.g. waistline 999
 
-```{r
+##Remove outliers e.g. waistline 999
+
+```{r}
 # Function to remove outliers using the IQR method for all numerical columns
-remove_outliers_all_columns <- function(df) {
-  numerical_cols <- sapply(df, is.numeric)  # Find numeric columns
+#remove_outliers_all_columns <- function(df) {
+ # numerical_cols <- sapply(df, is.numeric)  # Find numeric columns
   
   # Loop through numerical columns
-  for (col in names(df)[numerical_cols]) {
-    column <- df[[col]]
-    
+  #for (col in names(df)[numerical_cols]) {
+    #column <- df[[col]]
+   # 
     # Calculate the IQR
-    Q1 <- quantile(column, 0.25)
-    Q3 <- quantile(column, 0.75)
-    IQR <- Q3 - Q1
+  #  Q1 <- quantile(column, 0.25)
+   # Q3 <- quantile(column, 0.75)
+    #IQR <- Q3 - Q1
     
     # Define the lower and upper bounds
-    lower_bound <- Q1 - 1.5 * IQR
-    upper_bound <- Q3 + 1.5 * IQR
+    #lower_bound <- Q1 - 1.5 * IQR
+  #  upper_bound <- Q3 + 1.5 * IQR
     
     # Filter the dataframe to remove outliers for each column
-    df <- df[column >= lower_bound & column <= upper_bound, ]
-  }
+   # df <- df[column >= lower_bound & column <= upper_bound, ]
+  #}
   
-  return(df)
-}
+#  return(df)
+#}
 
 # Remove outliers in all numerical columns of the dataframe 'df'
-data <- remove_outliers_all_columns(data)
+#data <- remove_outliers_all_columns(data)
 
 ```
 
@@ -309,8 +310,8 @@ confusionMatrix(predic, as.factor(Y_test))
 
 ```
 
-## leave to be edited
-```{r
+
+```{r}
 # Set up cross-validation
 control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
 
@@ -414,7 +415,8 @@ print(p)
 ```
 The age data are mainly concentrated in the 35-65 age group, which shows that the subjects who provided the data are generally middle-aged and elderly people.
 
-We still split the data into training data and test data according to the ratio of 80%
+We split the data into training data and test data according to the ratio of 80%
+
 ```{r}
 # Set a random seed to ensure reproducible results
 set.seed(123)
@@ -580,4 +582,9 @@ The True Positive Rate provided by xgboost is about 0.738, which is almost equal
 Compared with the decision tree model, xgboost did not significantly improve the accuracy of prediction, which may be due to many reasons. One of the possible reasons is the data itself.Due to its characteristics, model regression in most cases may not provide higher accuracy unless more detailed or targeted processing is performed.
 
 However, compared to accuracy, the most powerful thing about the xgboost model is its saving of computing time! After the number of rounds reaches more than 10 times, the change in accuracy has been less than 1%. In actual use, 10-20 boost rounds can meet the demand. Even when processing larger data, the xgboost algorithm will greatly reduce the calculation time. In other words, the xgboost algorithm is excellent in both efficiency and accuracy.
+
+## Conclusion
+
+
+
 
