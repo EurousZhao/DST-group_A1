@@ -51,4 +51,5 @@ Yifan and Hugh R wrote the R analysis, Jiaqi and Revati wrote the Python analysi
 We have placed our reflections in the folder:
 
 * reflection/
+* Individual Reflection by Yifan Wang.pdf
 
