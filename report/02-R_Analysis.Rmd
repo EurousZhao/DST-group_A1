@@ -585,6 +585,13 @@ However, compared to accuracy, the most powerful thing about the xgboost model i
 
 ## Conclusion
 
+For this particular dataset, both Decision Trees and XGBoost achieved similar accuracy levels, but XGBoost demonstrated superior speed. Additionally, the decrease in accuracy for Decision Trees after using PCA suggests that feature engineering and preprocessing are critical considerations when working with Decision Trees. However, XGBoost seems more resilient to dimensionality reduction, which is an advantage in scenarios where feature engineering is required.
 
+Specifically, we compare the following points:
 
+Accuracy: Both Decision Trees and XGBoost exhibit similar accuracy levels, both around 74%. This suggests that, for this specific dataset, Decision Trees, despite their simplicity, can perform on par with the more complex XGBoost algorithm.
+
+Speed: XGBoost outperforms Decision Trees in terms of speed. It is a gradient boosting algorithm that is optimized for efficiency, making it a faster option for training and making predictions. This can be especially advantageous for large datasets or real-time applications.
+
+Preprocessing Impact: It's interesting to note that when using PCA for preprocessing, the accuracy of the Decision Tree model decreased. This indicates that the feature reduction caused by PCA may have removed some information important for Decision Trees, leading to a lower accuracy. On the other hand, XGBoost may be more robust to this reduction in dimensionality due to its ensemble nature and feature selection capabilities.
 
