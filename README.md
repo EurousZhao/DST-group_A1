@@ -19,8 +19,8 @@ The report takes the following structure:
 * 02-R_analysis.Rmd
 * 03-Python_Analysis.ipynb
 * 04-Wrapup.Rmd
-
-With html output of the Rmd content included for convenience.
+  
+01-Data.Rmd need to run first to download the dataset.
 
 ### Requirements:
 
