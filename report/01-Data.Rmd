@@ -25,6 +25,8 @@ We pose as analysts at a health insurance broker. The data has been collected fr
 
 * We acknowledge the incredibly unlikely situation where an insurance broker would have an insured person's gamma GTP level (one of the features) but not be able to ask whether they drink or not. However, we postulate our policyholders would be untruthful in answering this question, so we must predict the answer ourselves.
 
+The main point of this is to frame our chosen performance metric, Sensitivity/Recall. From our contextual set up, we reason a false negative (assigning a lower premium to a drinker) could be rectified via reimbursement of the policy holder, while a false positive (failing to assign a higher premium to a drinker) would incur potential financial loss if we were to cover a health issue we hadn't collected sufficient funds to pay for.  Therefore, we determined the true positive rate to be the key performance indicator for our models.
+
 ## Library requirements
 
 Each script handles its own requirements using a simple check-and-install system.
