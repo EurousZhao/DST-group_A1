@@ -5,9 +5,17 @@ output: html_notebook
 
 ## Wrapup
 
-We used four different models to perform binary classification on whether to drink alcohol. We used python to implement KNN and linear regression, and used R to implement decision trees and xgboost.
-We then used a confusion matrix to evaluate their recall rate.
+As Health Insurance Broker Analysts, we use four different models to perform binary classification on whether our policy holders are alcohol drinkers or not. We used python to implement KNN and linear regression, and used R to implement decision trees and xgboost.
+
+We then used a confusion matrix or direct computation to evaluate their recall rate, which was deemed as the key performance metric when considering potential financial risk to the broker in a real-world scenario.
 
 ## Conclusions
 
-We compared the models from many aspects and came to some interesting conclusions
+In order, we rank the models with their recall:
+
+Decision Trees - 74.5%
+XGBoost - 73.1%
+Linear Regression - 70.3%
+KNN - 67.1%
+
+Thus we can say the Decision Tree model was the 'best' in the sense it would most protect the broker from the risk of paying out a claim without sufficient funds. This could translate between the difference between going bankrupt and not.
