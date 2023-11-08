@@ -52,4 +52,5 @@ We have placed our reflections in the folder:
 
 * reflection/
 * Individual Reflection by Yifan Wang.pdf
+* Jiaqi_Reflection.pdf
 
