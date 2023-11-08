@@ -7,27 +7,27 @@ output: html_notebook
 
 The brief was to:
 
-* Consider a binary classification problem in which each group member will create a model submission that can be evaluated on lefft-out test data
-* Together agree and test a performance metric
+* Consider a binary classification problem in which each group member will create a model submission that can be evaluated on left-out test data
+* Together, agree and test a performance metric
 * Compare our models according to that performance metric
 
 ## The team
 
-We are a four person team consisting of, *Jiaqi*, *Revati*, *Yifan*, and *Hugh*. We decided to split into pairs, Hugh and Yifan, Jiaqi and Revati, to contribute into R and Python analyses respectively. We all intend on contributing equally to this project.
+We are a four-person team consisting of, *Jiaqi*, *Revati*, *Yifan*, and *Hugh*. We decided to split into pairs, Hugh and Yifan, Jiaqi and Revati, to contribute to R and Python analyses, respectively. We all intend to contribute equally to this project.
 
 ## Introduction and Problem Context
 
-The data we selceted is a large dataset with 22 body/health related features, a ternary classification for smoking, and a binary classification for whether someone drinks or not.
+The data we selected is a large dataset with 22 body/health-related features, a ternary classification for smoking, and a binary classification for whether someone drinks or not.
 
-Whilst the overall binary classification problem on the drinking target is clear, we find it improtant to provide a real-world scenario in which we will be working our analyses towards. 
+Whilst the overall binary classification problem on the drinking target is clear, we find it important to provide a real-world scenario in which we will be working our analyses towards. 
 
-We pose as analysts at a health insurance broker. The data has been collected from our policy holders and we need to determine from this data whether they drink or not as to assign a higher premium if they do, given the far greater health risks associated with drinking.
+We pose as analysts at a health insurance broker. The data has been collected from our policyholders, and we need to determine from this data whether they drink or not as to assign a higher premium if they do, given the far greater health risks associated with drinking.
 
-* We acknlowedge the incredibly unlikely situaton where an insurance broker would have an insured person's gamma GTP level (one of the features) but not be able to ask whether they drink or not. However, we postulate our policy holders would be untruthful in answering this question so we must predict the asnwer ourselves.
+* We acknowledge the incredibly unlikely situation where an insurance broker would have an insured person's gamma GTP level (one of the features) but not be able to ask whether they drink or not. However, we postulate our policyholders would be untruthful in answering this question, so we must predict the answer ourselves.
 
 ## Library requirements
 
-Each script handles it's own requirments, using a simple check-and-install system.
+Each script handles its own requirements using a simple check-and-install system.
 
 Separate requirements files are given for ease of use.
 
@@ -40,7 +40,7 @@ library("fs")
 
 ## The data
 
-We found a good dataset for binary classificatoin on Kaggle.
+We found a good dataset for binary classification on Kaggle.
 
 To obtain this dataset in a convenient format for both analyses, we will download it and process it into a standard form.
 
@@ -52,7 +52,7 @@ We place raw data in the `data` folder in the main branch.
 
 ### Get the data
 
-First create a directory for it to go in:
+First, create a directory for it to go in:
 ```{r}
 rawdatadir=path_wd("..","data","raw")
 if(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = TRUE)
@@ -71,7 +71,7 @@ The data is already headed.
 data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
 ```
 
-whilst we could've processed the data a little here, we decided to do that in the analyses to greater contribution to the narrative of understanding and processing the data.
+whilst we could've processed the data a little here, we decided to do that in the analyses to make a greater contribution to the narrative of understanding and processing the data.
 
 ### Summary
 
