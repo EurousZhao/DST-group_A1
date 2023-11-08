@@ -1725,43 +1725,43 @@ Introduction</h1>
 <p>The brief was to:</p>
 <ul>
 <li>Consider a binary classification problem in which each group member
-will create a model submission that can be evaluated on lefft-out test
+will create a model submission that can be evaluated on left-out test
 data</li>
-<li>Together agree and test a performance metric</li>
+<li>Together, agree and test a performance metric</li>
 <li>Compare our models according to that performance metric</li>
 </ul>
 </div>
 <div id="the-team" class="section level2">
 <h2>The team</h2>
-<p>We are a four person team consisting of, <em>Jiaqi</em>,
+<p>We are a four-person team consisting of, <em>Jiaqi</em>,
 <em>Revati</em>, <em>Yifan</em>, and <em>Hugh</em>. We decided to split
-into pairs, Hugh and Yifan, Jiaqi and Revati, to contribute into R and
-Python analyses respectively. We all intend on contributing equally to
+into pairs, Hugh and Yifan, Jiaqi and Revati, to contribute to R and
+Python analyses, respectively. We all intend to contribute equally to
 this project.</p>
 </div>
 <div id="introduction-and-problem-context" class="section level2">
 <h2>Introduction and Problem Context</h2>
-<p>The data we selceted is a large dataset with 22 body/health related
+<p>The data we selected is a large dataset with 22 body/health-related
 features, a ternary classification for smoking, and a binary
 classification for whether someone drinks or not.</p>
 <p>Whilst the overall binary classification problem on the drinking
-target is clear, we find it improtant to provide a real-world scenario
+target is clear, we find it important to provide a real-world scenario
 in which we will be working our analyses towards.</p>
 <p>We pose as analysts at a health insurance broker. The data has been
-collected from our policy holders and we need to determine from this
+collected from our policyholders, and we need to determine from this
 data whether they drink or not as to assign a higher premium if they do,
 given the far greater health risks associated with drinking.</p>
 <ul>
-<li>We acknlowedge the incredibly unlikely situaton where an insurance
+<li>We acknowledge the incredibly unlikely situation where an insurance
 broker would have an insured person’s gamma GTP level (one of the
 features) but not be able to ask whether they drink or not. However, we
-postulate our policy holders would be untruthful in answering this
-question so we must predict the asnwer ourselves.</li>
+postulate our policyholders would be untruthful in answering this
+question, so we must predict the answer ourselves.</li>
 </ul>
 </div>
 <div id="library-requirements" class="section level2">
 <h2>Library requirements</h2>
-<p>Each script handles it’s own requirments, using a simple
+<p>Each script handles its own requirements using a simple
 check-and-install system.</p>
 <p>Separate requirements files are given for ease of use.</p>
 <p>We need <code>fs</code> to be able to handle directories in a
@@ -1773,7 +1773,7 @@ and is good data science practice.</p>
 </div>
 <div id="the-data" class="section level2">
 <h2>The data</h2>
-<p>We found a good dataset for binary classificatoin on Kaggle.</p>
+<p>We found a good dataset for binary classification on Kaggle.</p>
 <p>To obtain this dataset in a convenient format for both analyses, we
 will download it and process it into a standard form.</p>
 <p>We place raw data in the <code>data</code> folder in the main
@@ -1789,18 +1789,18 @@ branch.</p>
 </ul>
 <div id="get-the-data" class="section level3">
 <h3>Get the data</h3>
-<p>First create a directory for it to go in:</p>
+<p>First, create a directory for it to go in:</p>
 <pre class="r"><code class="hljs">rawdatadir=path_wd(<span class="hljs-string">".."</span>,<span class="hljs-string">"data"</span>,<span class="hljs-string">"raw"</span>)
 <span class="hljs-keyword">if</span>(!dir.exists(rawdatadir)) dir.create(rawdatadir,recursive = <span class="hljs-literal">TRUE</span>)</code></pre>
 <p>Download it</p>
-<pre class="r"><code class="hljs">download.file(<span class="hljs-string">"https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/Datasets/smoking_driking_dataset.csv"</span>,path_wd(<span class="hljs-string">".."</span>,<span class="hljs-string">"data"</span>,<span class="hljs-string">"raw"</span>,<span class="hljs-string">"smoking_driking_dataset.csv"</span>))</code></pre>
+<pre class="r"><code class="hljs">download.file(<span class="hljs-string">"https://raw.githubusercontent.com/EurousZhao/DST-group_A1/main/data/smoking_driking_dataset.csv"</span>,path_wd(<span class="hljs-string">".."</span>,<span class="hljs-string">"data"</span>,<span class="hljs-string">"raw"</span>,<span class="hljs-string">"smoking_driking_dataset.csv"</span>))</code></pre>
 <p>The data is already headed.</p>
 </div>
 <div id="create-the-data-output" class="section level3">
 <h3>Create the data output</h3>
 <pre class="r"><code class="hljs">data &lt;- read.table(path_wd(<span class="hljs-string">".."</span>,<span class="hljs-string">"data"</span>,<span class="hljs-string">"raw"</span>,<span class="hljs-string">"smoking_driking_dataset.csv"</span>),header=<span class="hljs-literal">TRUE</span>, sep = <span class="hljs-string">","</span>)</code></pre>
 <p>whilst we could’ve processed the data a little here, we decided to do
-that in the analyses to greater contribution to the narrative of
+that in the analyses to make a greater contribution to the narrative of
 understanding and processing the data.</p>
 </div>
 <div id="summary" class="section level3">
