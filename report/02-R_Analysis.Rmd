@@ -34,114 +34,104 @@ library(caTools)
 
 ## Data
 
+Call the data in from the directory created in '01_Data' and convert character columns into numeric binary valued columns so they can be correlated and analysed further.
 ```{r}
 data <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
-dataog <- read.table(path_wd("..","data","raw","smoking_driking_dataset.csv"),header=TRUE, sep = ",")
 data <- as.data.frame(data)
 df <- as.data.frame(data)
 data$DRK_YN <- ifelse(data$DRK_YN == "Y", 1, 0)       # MUST ONLY BE RUN ONCE !
 data$sex <- ifelse(data$sex == "Male", 1, 0)
 # Convert DRK_YN and sex columns to numeric encoding
-dataog$DRK_YN <- as.numeric(factor(df$DRK_YN))
-dataog$sex <- as.numeric(factor(df$sex))
-```
-
-
-```{r}
-typeof(data)
-class(data)
-dim(data)
-head(data)
-summary(data)
-str(data)
-```
-
-##Remove outliers e.g. waistline 999
-
-```{r}
-# Function to remove outliers using the IQR method for all numerical columns
-#remove_outliers_all_columns <- function(df) {
- # numerical_cols <- sapply(df, is.numeric)  # Find numeric columns
-  
-  # Loop through numerical columns
-  #for (col in names(df)[numerical_cols]) {
-    #column <- df[[col]]
-   # 
-    # Calculate the IQR
-  #  Q1 <- quantile(column, 0.25)
-   # Q3 <- quantile(column, 0.75)
-    #IQR <- Q3 - Q1
-    
-    # Define the lower and upper bounds
-    #lower_bound <- Q1 - 1.5 * IQR
-  #  upper_bound <- Q3 + 1.5 * IQR
-    
-    # Filter the dataframe to remove outliers for each column
-   # df <- df[column >= lower_bound & column <= upper_bound, ]
-  #}
-  
-#  return(df)
-#}
-
-# Remove outliers in all numerical columns of the dataframe 'df'
-#data <- remove_outliers_all_columns(data)
-
-```
-
-```{r}
-summary(data)
-```
-```{r}
-summary(dataog)
-```
-
-
-Below is an explanation of these variables, which represent body data:
-
-Sex	male, female	
-age	round up to 5 years	
-height	round up to 5 cm[cm]	
-weight	[kg]	
-sight_left	eyesight(left)	
-sight_right	eyesight(right)	
-hear_left	hearing left, 1(normal), 2(abnormal)	
-hear_right	hearing right, 1(normal), 2(abnormal)	
-SBP	Systolic blood pressure[mmHg]	 
-DBP	Diastolic blood pressure[mmHg]	 
-BLDS	BLDS or FSG(fasting blood glucose)[mg/dL]	
-tot_chole	total cholesterol[mg/dL]	 
-HDL_chole	HDL cholesterol[mg/dL]	HDL 
-LDL_chole	LDL cholesterol[mg/dL]	LDL 
-triglyceride	triglyceride[mg/dL]	
-hemoglobin	hemoglobin[g/dL]	
-urine_protein	protein in urine, 1(-), 2(+/-), 3(+1), 4(+2), 5(+3), 6(+4)	 
-serum_creatinine	serum(blood) creatinine[mg/dL] 
-SGOT_AST	SGOT(Glutamate-oxaloacetate transaminase) AST(Aspartate transaminase)[IU/L]	 AST
-SGOT_ALT	ALT(Alanine transaminase)[IU/L]	 ALT
-gamma_GTP	y-glutamyl transpeptidase[IU/L]	
-SMK_stat_type_cd	Smoking state, 1(never), 2(used to smoke but quit), 3(still smoke)	
-DRK_YN	Drinker or Not
-
-
-We first convert the drinking data into numbers to facilitate our binary classification
-```{r}
-# Convert DRK_YN and sex columns to numeric encoding
-df$DRK_YN <- as.numeric(factor(df$DRK_YN))
-df$sex <- as.numeric(factor(df$sex))
-
 data$DRK_YN <- as.numeric(factor(data$DRK_YN))
 data$sex <- as.numeric(factor(data$sex))
+df$DRK_YN <- as.numeric(factor(df$DRK_YN))
+df$sex <- as.numeric(factor(df$sex))
 ```
 
 
+Some basic functions describing the data.
+```{r}
+typeof(data)    # Self explanatory descriptive functions
+class(data)
+dim(data)
+```
+
+Below is an explanation of the headers:
+
+Sex	- male, female	
+age	- round up to 5 years	
+height	- round up to 5 cm[cm]	
+weight	- [kg]	
+sight_left	- eyesight(left)	
+sight_right	- eyesight(right)	
+hear_left	- hearing left, 1(normal), 2(abnormal)	
+hear_right	- hearing right, 1(normal), 2(abnormal)	
+SBP	- Systolic blood pressure[mmHg]	 
+DBP	- Diastolic blood pressure[mmHg]	 
+BLDS	- BLDS or FSG(fasting blood glucose)[mg/dL]	
+tot_chole	- total cholesterol[mg/dL]	 
+HDL_chole	- HDL cholesterol[mg/dL]	HDL 
+LDL_chole	- LDL cholesterol[mg/dL]	LDL 
+triglyceride	- triglyceride[mg/dL]	
+hemoglobin	- hemoglobin[g/dL]	
+urine_protein	- protein in urine, 1(-), 2(+/-), 3(+1), 4(+2), 5(+3), 6(+4)	 
+serum_creatinine	- serum(blood) creatinine[mg/dL] 
+SGOT_AST	- SGOT(Glutamate-oxaloacetate transaminase) AST(Aspartate transaminase)[IU/L]	 AST
+SGOT_ALT	- ALT(Alanine transaminase)[IU/L]	 ALT
+gamma_GTP	- y-glutamyl transpeptidase[IU/L]	
+SMK_stat_type_cd	- Smoking state, 1(never), 2(used to smoke but quit), 3(still smoke)	
+DRK_YN	- Drinker or Not
+
+And here are some descriptive functions of them.
+```{r}
+head(data)
+summary(data)
+str(data)     # Identify the types of each feature and the target variable
+```
+
+We have a data frame with 240,000 rows and 24 body data columns. There is a mixture of categorical, discrete and continuous variables. Some normally continuous features, such as height and weight, are discrete by rounding up to the nearest multiple of 5. This is worth noting when considering scatter plots and how they may have linear streaks of data on each discrete value although, this shouldn't affect the overall correlations much.
+
+It is common practice to trim outlier data using a standard method such as the IQR method. We write a function that takes as input the data and vector of feature names and, using the IQR method, removes outliers in the named columns, outputting the refined data.
+```{r}
+remove_outliers_iqr <- function(data, columns) {
+  for (column_name in columns) {
+    Q1 <- quantile(data[[column_name]], 0.25)   # Quantile function
+    Q3 <- quantile(data[[column_name]], 0.75)
+    IQR <- Q3 - Q1
+    lower_bound <- Q1 - 1.5 * IQR
+    upper_bound <- Q3 + 1.5 * IQR
+    
+    data <- data[data[[column_name]] > lower_bound & data[[column_name]] < upper_bound, ]   # Jettison data falling outside of the bounds
+  }
+  
+  return(data)
+}
+```
+
+Having inspected our features using the *summary()* and *str()* functions, we know to apply outlier removal to non-categorical, continuous data.
+```{r}
+data_removed_outliers <- remove_outliers_iqr(data, c('waistline', 'sight_left', 'sight_right', 'SBP', 'DBP', 'BLDS', 'tot_chole', 'HDL_chole', 'LDL_chole', 'triglyceride', 'hemoglobin', 'serum_creatinine', 'SGOT_AST', 'SGOT_ALT', 'gamma_GTP'))
+```
+
+Contrasting to the previous summary, blatant anomalous data points such as waistline = 999.00 have been removed.
+```{r}
+summary(data_removed_outliers)
+dim(data_removed_outliers)
+```
+
+Whilst there are evident outlier data points, the data origin states that all of the data is predictive in nature towards the target. So for matters of comparison and improved accuracy we proceed later (test and training data) with the original data. 
+
+Check for empty columns.
 ```{r}
 colSums(is.na(data))
 ```
 
+No empty columns - we're good to go.
+
 ### Test/Train split
 
+To train our models, we split the data into 20% test and 80% training. We also further split the data by having the 23 (predictor) features as X_train and X_test, and the target variable 'DRK_YN' as Y_train and Y_test.
 ```{r}
-# Assuming 'dataset' is your data frame
 predictors <- data[, -which(names(data) == "DRK_YN")]
 target <- data$DRK_YN
 
@@ -157,48 +147,54 @@ Y_test <- target[-splitIndex]
 
 ## EDA and plots
 
+To perform some EDA we first create a random sample of size 10,000 so we plots don't take too long.
 ```{r}
-# Sample 10,000 rows from your_data
-sada <- data[sample(nrow(data), 10000), ]
-targetsada <- sada$DRK_YN
+# Sample 10,000 rows
+sample_data <- data_removed_outliers[sample(nrow(data), 10000), ]
+sample_data <- na.omit(sample_data)   # Omit empty rows for plotting
+target_sample_data <- sample_data$DRK_YN
 
-# 'sada' now contains 10,000 randomly selected rows from 'data'
-head(sada)
+# 'sample_data' now contains 10,000 randomly selected rows from 'data'
+head(sample_data)
 ```
 
+Box plots for each column.
 ```{r}
-# Example dataset (replace this with your own dataframe)
-your_data <- dataog  # Example dataset, you can replace this with your own dataframe
-
 # Adjusting plot margins and generating box plots for each column
 par(mfrow = c(ceiling(ncol(your_data) / 100), 2))  # Setting up the layout for plots
 par(mar = c(4, 4, 2, 1))  # Setting margin parameters: bottom, left, top, right
 
-for (col in names(your_data)) {
-  boxplot(your_data[[col]], main = col)  # Generating box plot for each column
+for (col in names(sample_data)) {
+  boxplot(sample_data[[col]], main = col)  # Generating box plot for each column
 }
-
 ```
 
-
+A simple scatter to capture an aneccdotally known correlation.
 ```{r}
-# Create a scatter plot
-plot(sada$weight, sada$height, 
+plot(sample_data$weight, sample_data$height, 
      xlab = "weight", ylab = "height", 
-     main = "Scatter Plot of x vs. y")
+     main = "Scatter Plot of weight vs. height")    # Labels and title
 ```
 
+Whilst not the most negative correlation, an interesting plot nonetheless. The relationship between high-density lipoprotein cholesterol and triglyceride levels is well-studied in the field of medicine due to it's impact on one's cardiovascular risk.
 ```{r}
-plot(sada$hemoglobin,sada$gamma_GTP)
+plot(sample_data$HDL_chole,sample_data$triglyceride,
+     xlab = "HDL Cholesterol", ylab = "Triglyceride Level", 
+     main = "Scatter Plot of HDL Cholesterol vs. Triglyceride Level")
 ```
 
+Here we plot two smoothed density curves for the hemoglobin feature, splitting into non-drinkers (salmon = 1) and drinkers (cyan = 2).
 ```{r}
-ggplot(sada, aes(x = `hemoglobin`, group = targetsada, fill = targetsada)) +
+target_sample_data <- as.factor(target_sample_data)   # Setting the target as a factor so the plot doesn't think the scale is from 1 to 2
+ggplot(sample_data, aes(x = `hemoglobin`, group = target_sample_data, fill = target_sample_data)) +
   geom_density(alpha = 0.5)
 ```
 
-##  Feature Selection and Correlation - Test/train split + Feature selection + correlation/PCA
+Whilst both curves have a large area of cross-over there is enough of a discernible difference between the density functions for hemoglobin to have a significant correlation to the `DRK_YN`.
 
+## Correlation and Feature Selection
+
+We want to inspect how all the features correlate to see if we can reduce the feature selection and simplify the model for greater accuracy.
 ```{r}
 correlation_matrix <- cor(data)
 
@@ -212,37 +208,24 @@ sorted_correlations <- sort(target_correlations, decreasing = TRUE)
 print(sorted_correlations)
 ```
 
+If we count the variables that have the highest impact on drinking, we find that whether drinking has a large positive correlation with the four variables of sex, height, smoking, and hemoglobin concentration, and a large negative correlation with age. Most interestingly we see a person's height having the greatest correlation with whether they drink or not.
+
+One possible explanation is that there is a large positive correlation between body size and gender, which is caused by the fact that men are generally taller than women. All we have to do is look at the relationship between gender and height, hemoglobin and smoking
+
+Plotting the correlation matrix.
 ```{r}
 corrplot(correlation_matrix, method = "color")
 ```
 
+Visualizing the correlation matrix plot allows us to see this very quickly. No doubt, height, weight, hemoglobin and smoking have a very large positive correlation with gender!
 
-If we count the variables that have the highest impact on drinking, we find that whether drinking has a large positive correlation with the four variables of sex, height, smoking, and hemoglobin concentration, and a large negative correlation with age. 
-Among them, height has the greatest impact, which may be unexpected.
-
-One possible explanation is that there is a large positive correlation between body size and gender, which is caused by the fact that men are generally taller than women. All we have to do is look at the relationship between gender and height, hemoglobin and smoking
-
-Visualizing the correlation matrix plot allows us to see this very quickly.No doubt, height, weight, hemoglobin and smoking have a very large positive correlation with gender!
-This means that many of these variables work together.
-
-### picking only uncorrelated features
-
-```{r}
-# Assuming 'correlation_matrix' is your correlation matrix
-#high_correlation_threshold <- 0.85  # Define a correlation threshold
-
-# Find highly correlated features
-#highly_correlated <- findCorrelation(correlation_matrix, cutoff = high_correlation_threshold)
-
-# Remove highly correlated features
-#reduced_features <- X_train[, -highly_correlated]
-#print(reduced_features)
-```
+For one method of covariate selection: we could obtain a subset of variables with greatest absolute correlation with `DRK_YN` which are all still highly uncorrelated with each other. However, we elect to use PCA in this instance.
 
 ### PCA
 
+We apply PCA to the data and show the output princciapal components.
 ```{r}
-# Scale the data for PCA (optional but recommended)
+# Scale the data for PCA
 scaled_data <- scale(predictors)
 
 # Apply PCA
@@ -255,25 +238,24 @@ summary(pca_result)
 reduced_data <- as.data.frame(predict(pca_result))
 ```
 
-We take the first 12 principal components which capture 80% of the variance
+We take the first 12 principal components which capture 85%> of the variance, a threshold we have set.
 
+We reduce the PCA data down to the initial 12 PCs.
 ```{r}
 data_pca <- as.data.frame(pca_result$x[, 1:12])
-correlation_matrix2 <- cor(data_pca)
-corrplot(correlation_matrix2, method = "color")
+head(data_pca)
 ```
 
-We'll reduce the PCA result data frame into our 12 PCs that capture our vairance tolerance
-
+Plot the correlation matrix.
 ```{r}
-head(data_pca)
+correlation_matrix2 <- cor(data_pca)
+corrplot(correlation_matrix2, method = "color")
 ```
 
 We now create training and test data based on PC1-PC12 to see how it compares ahead with model accuracy
 
 ```{r}
-# Assuming 'dataset' is your data frame
-predictors_pca <- data_pca[, -which(names(data) == "DRK_YN")]
+predictors_pca <- data_pca[, -which(names(data) == "DRK_YN")]   # Same procedure as previous
 target_pca <- data$DRK_YN
 
 # Split the data into training and testing sets
@@ -286,13 +268,17 @@ Y_test_pca <- target_pca[-splitIndex]
 ```
 
 ## Decision Trees
+
 A decision tree is a fundamental machine learning model used for both classification and regression tasks. It is a hierarchical structure that makes decisions based on the values of input features. In a decision tree, the data is split into subsets based on the feature values, and at each internal node of the tree, a decision is made to determine the path to follow. The leaves of the tree represent the final output or prediction.
+
+Run both training data sets on the decision tree model.
 ```{r}
 # Assuming X_train is the matrix/data.frame of features and Y_train is the target variable
 tree <- rpart(Y_train ~ ., data = X_train, method = "class")
 tree_pca <- rpart(Y_train_pca ~ ., data = cbind(X_train_pca, Y_train_pca), method = "class")
 ```
 
+Make prediction set against left-out test data for both the normal and PCA-transformed data sets, and show Confusion Matrix, detailing various performance metrics, for both.
 ```{r}
 test_pred <- predict(tree, X_test, type = "class")
 test_pred_pca <- predict(tree_pca, X_test_pca, type = "class")
@@ -304,13 +290,13 @@ print(test_confMat)
 print(test_confMat_pca)
 ```
 
-```{r}
-predic <- predict(tree, X_test, type = "class")
-confusionMatrix(predic, as.factor(Y_test))
+Results are discussed at the end of this section.
 
-```
+### Optimisation
 
+The decision is tree is optimised to find the 'best' complexity level, to see if we can yield greater accuracy in the Confusion Matrix.
 
+Warning: This takes ~1min to run - it can be skipped as the result is explained below.
 ```{r}
 # Set up cross-validation
 control <- trainControl(method = "cv", number = 10)  # 10-fold cross-validation
@@ -330,14 +316,11 @@ text(final_tree)
 
 ```
 
+The optimal complexity is found to be 0.01 which yields the same results as the original tree. So in the scope of decision tree factors, we have the highest performance metric levels.
 
-```{r}
-trex <- rpart(Y_train ~ ., data = X_train, method = "class", control = rpart.control(maxdepth = 10, cp = 0.01))
-predx <- predict(trex, X_test, type = "class")
-confusionMatrix(predx, as.factor(Y_test))
-```
+### Visualisation of Results
 
-This part uses visual processing of confusion matrices
+Visualise the Confusion Matrices.
 ```{r}
 test_confMatdf <- as.data.frame(test_confMat$table)
 ggplot(data = test_confMatdf, aes(x = Reference, y = Prediction, fill = Freq)) +
@@ -352,11 +335,12 @@ ggplot(data = test_confMatdf_pca, aes(x = Reference, y = Prediction, fill = Freq
   labs(title = "Confusion Matrix", x = "Actual", y = "Predicted")
 ```
 
+Plot the trees.
 ```{r}
 rpart.plot(tree)
 rpart.plot(tree_pca)
 ```
-
+We see an even greater simplicity in the tree ran on PCA-transformed data, indicating the principal components captured too low a level of variance.
 
 ### Decision Tree Analysis
 
@@ -366,7 +350,7 @@ Whilst not high we can be happy that the Sensitivity is higher than specificity,
 
 When trying to maximize accuracy against depth and complexity we found the lowest level of complexity to achieve greatest results. Given that the correlations of all the features with the target are low we can rule out model simplicity where a decision tree may fall short. We can also reasonably rule out the homogeneity of the features as using Principal Component Analysis with 12 entirely uncorrelated Principal Components that still captured a high enough threshold of the data, we still saw lower accuracy. 
 
-we maintain that the model is good given it's 74% true positive rate.
+We maintain that the model is good given its 74% true positive rate.
 
 
 ## XGBoost
@@ -491,6 +475,8 @@ cat("Recall (True Positive Rate): ", format(recall, nsmall = 2), "\n")
 ## The relationship between accuracy and number of iterations
 
 In the normal settings of xgboost, the accuracy will change slightly with the different number of rounds, and its value is not monotonically increasing. It will reach the maximum value in a certain interval.
+
+Warning: Takes ~2min to run.
 ```{r}
 # Data preparation
 X_train <- as.matrix(X_train)
