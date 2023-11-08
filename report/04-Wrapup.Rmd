@@ -10,3 +10,4 @@ We then used a confusion matrix to evaluate their recall rate.
 
 ## Conclusions
 
+We compared the models from many aspects and came to some interesting conclusions
