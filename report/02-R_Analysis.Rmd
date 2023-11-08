@@ -6,6 +6,8 @@ date: "2023-10-09"
 
 # R Analysis
 
+We advise you run the whole document (all chunks) now so that time consuming iterative processes at the end of the analysis are completed upon reading.
+
 ## Pre-requisites
 
 Required Libraries:
@@ -49,7 +51,7 @@ df$sex <- as.numeric(factor(df$sex))
 ```
 
 
-Some basic functions describing the data.
+Some basic functions describing the data set.
 ```{r}
 typeof(data)    # Self explanatory descriptive functions
 class(data)
@@ -82,7 +84,7 @@ gamma_GTP	- y-glutamyl transpeptidase[IU/L]
 SMK_stat_type_cd	- Smoking state, 1(never), 2(used to smoke but quit), 3(still smoke)	
 DRK_YN	- Drinker or Not
 
-And here are some descriptive functions of them.
+Here are some descriptive functions of the variables.
 ```{r}
 head(data)
 summary(data)
@@ -344,9 +346,9 @@ We see an even greater simplicity in the tree ran on PCA-transformed data, indic
 
 ### Decision Tree Analysis
 
-The best recall/sensitivity we could obtain from the decision tree is 74% (2d.p.) using all the features, whilst we had 69% (2d.p.) on the PCA-transformed dataset.
+The best recall/sensitivity we could obtain from the decision tree is 74.5% (2d.p.) using all the features, whilst we had 69% (2d.p.) on the PCA-transformed dataset.
 
-Whilst not high we can be happy that the Sensitivity is higher than specificity, which is 65% (2d.p.) using all features, as we've outlined in our intro to be the most important performance metric.
+Whilst not as high as we'd like, we can be happy that the Sensitivity is higher than Specificity, which is 65% (2d.p.) using all features, as we've outlined in our intro to be the most important performance metric.
 
 When trying to maximize accuracy against depth and complexity we found the lowest level of complexity to achieve greatest results. Given that the correlations of all the features with the target are low we can rule out model simplicity where a decision tree may fall short. We can also reasonably rule out the homogeneity of the features as using Principal Component Analysis with 12 entirely uncorrelated Principal Components that still captured a high enough threshold of the data, we still saw lower accuracy. 
 
