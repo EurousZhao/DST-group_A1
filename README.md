@@ -20,7 +20,7 @@ The report takes the following structure:
 * 03-Python_Analysis.ipynb
 * 04-Wrapup.Rmd
   
-01-Data.Rmd need to run first to download the dataset.
+01-Data.Rmd must be to run first to download the dataset.
 
 ### Requirements:
 
