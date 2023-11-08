@@ -1,8 +1,5 @@
----
-title: "Hugh_Reflection"
-output: html_document
-date: "2023-11-08"
----
+# Reflection for Assessment 1, Week 7
+## Hugh Pullin, Nov 2023
 
 Our group was assigned an open binary classification problem, with a strong emphasis on selecting an appropriate performance metric for model evaluation.
 
